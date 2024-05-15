@@ -743,7 +743,7 @@
   "sourceMap": "66:202:0:-:0;;;;;;;;;;;;;;;;;;;",
   "deployedSourceMap": "66:202:0:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;199:67;;;:::i;:::-;;;;;;;:::i;:::-;;;;;;;;143:52;;;;;;;;;;;;;:::i;:::-;;:::i;:::-;;199:67;238:7;260:1;;253:8;;199:67;:::o;143:52::-;188:2;184:1;:6;;;;143:52;:::o;7:77:1:-;44:7;73:5;62:16;;7:77;;;:::o;90:118::-;177:24;195:5;177:24;:::i;:::-;172:3;165:37;90:118;;:::o;214:222::-;307:4;345:2;334:9;330:18;322:26;;358:71;426:1;415:9;411:17;402:6;358:71;:::i;:::-;214:222;;;;:::o;523:117::-;632:1;629;622:12;769:122;842:24;860:5;842:24;:::i;:::-;835:5;832:35;822:63;;881:1;878;871:12;822:63;769:122;:::o;897:139::-;943:5;981:6;968:20;959:29;;997:33;1024:5;997:33;:::i;:::-;897:139;;;;:::o;1042:329::-;1101:6;1150:2;1138:9;1129:7;1125:23;1121:32;1118:119;;;1156:79;;:::i;:::-;1118:119;1276:1;1301:53;1346:7;1337:6;1326:9;1322:22;1301:53;:::i;:::-;1291:63;;1247:117;1042:329;;;;:::o",
   "source": "// SPDX-License-Identifier: MIT\npragma solidity >=0.4.22 <0.9.0;\n\ncontract MockupContract {\n  // constructor() public {\n  // }\n  uint256 a;\n\n  function setter(uint256 _a) public {\n    a = _a;\n  }\n\n  function getter() public view returns (uint256) {\n    return a;\n  }\n}\n",
-  "sourcePath": "/Users/derekxiao/project_w2/contracts/MockupContract.sol",
+  "sourcePath": "/Users/derekxiao/project_w2/ganache_contracts/contracts/MockupContract.sol",
   "ast": {
     "absolutePath": "project:/contracts/MockupContract.sol",
     "exportedSymbols": {
@@ -1012,12 +1012,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x51E14cE20fDE4b0E42FFE4CC1A6E3a68b303A55c",
-      "transactionHash": "0x05b5aa81d7e75dad5cc26f001dbaabf69a45bf53f88f08c954e9d7b793000e13"
+      "address": "0xF67AD36d020f1Bc33C52f11f95C3025B76DFcA13",
+      "transactionHash": "0xb7114c9d16523f000e5950f2bc95b01b889819f1a49305f08f136dec618b152a"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-05-14T18:45:01.600Z",
+  "updatedAt": "2024-05-15T18:03:07.143Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
