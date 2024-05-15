@@ -1,5 +1,4 @@
 'use client'
-import styles from "./styles/page.module.css";
 import Web3 from "web3";
 import MockupContract from "../contracts/MockupContract.json";
 import { useState, useEffect } from "react";
