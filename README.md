@@ -10,3 +10,9 @@ npm run dev
 Install Web3 (for interaction with smart contracts):
 npm install web3
 
+
+How to run server_app:
+1. cd server_app
+2. Run "npm run dev"
+
+
