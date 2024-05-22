@@ -2,7 +2,7 @@ A secure and auditable heathcare records management system using blockchain smar
 
 truffle migrate --reset for deploying smart contracts
 
-In order to start the nextjs application, type:
+react configs: npm install create-react-app
 
 cd healthrecordsdapp
 npm run dev
