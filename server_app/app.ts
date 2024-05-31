@@ -2,8 +2,7 @@ import express, { Express } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
-import { AuthController } from "./lib/controllers/auth-controller";
-
+import { AuthRouter, authRoute } from "./routes/auth";
 
 dotenv.config();
 
@@ -14,8 +13,7 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("tiny"));
 
-
-app.use(`${base_url}/${AuthController.route}`, AuthController.register);
+app.use(`${base_url}/${authRoute}`, AuthRouter);
 
 // app.get("*", (req, res) => {});
 
