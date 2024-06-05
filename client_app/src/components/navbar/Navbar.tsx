@@ -8,19 +8,19 @@ const Navbar = () => {
     <nav>
       <div className="left">
         <a href="/">Home</a>
-        <a href="/">Search</a>
+        <a href="/search">Search</a>
       </div>
       <div className="right">
-        <a href="/">Login</a>
-        <a href="/">Signup</a>
+        <a href="/login">Login</a>
+        <a href="/signup">Signup</a>
         <div className="menuIcon">
           <img src={menuIcon} alt="" onClick={() => setOpen((prev) => !prev)} />
         </div>
         <div className={open ? "menu active" : "menu"}>
           <a href="/">Home</a>
-          <a href="/">Search</a>
-          <a href="/">Login</a>
-          <a href="/">Signup</a>
+          <a href="/search">Search</a>
+          <a href="/login">Login</a>
+          <a href="/login">Signup</a>
         </div>
       </div>
     </nav>

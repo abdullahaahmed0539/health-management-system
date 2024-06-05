@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { addPatient, fetchPatientById, updatePatient } from '../services/PatientService';
+import { addPatient, fetchPatientById, updatePatient } from '../../services/PatientService';
 import { useParams, useHistory } from 'react-router-dom';
 
 function PatientForm() {
