@@ -49,14 +49,14 @@ const patientSchema = new mongoose.Schema({
     require: [true, "Country is required."],
     trim: true,
   },
-  treatmentHistory: {
-    type: [Treatment],
-    trim: true,
-  },
-  guardianInfo: {
-    type: [GuardianContact],
-    trim: true,
-  },
+  // treatmentHistory: {
+  //   type: [Treatment],
+  //   trim: true,
+  // },
+  // guardianInfo: {
+  //   type: [GuardianContact],
+  //   trim: true,
+  // },
 });
 
 const Patient = mongoose.model("patients", patientSchema);
