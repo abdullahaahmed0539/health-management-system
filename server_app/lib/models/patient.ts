@@ -3,6 +3,11 @@ import Treatment from "./treatment";
 import GuardianContact from "./guardian-contact";
 
 const patientSchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    require: [true, "User Id is required."],
+    trim: true,
+  },
   firstName: {
     type: String,
     require: [true, "First name is required."],

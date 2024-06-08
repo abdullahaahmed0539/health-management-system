@@ -9,6 +9,8 @@ const patientRoute: string = "patients";
 
 
 router.route("/").get(checkAuth, patientController.getAll);
+router.route("/").post(checkAuth, patientController.add);
+
 
 
 export { router as PatientRouter, patientRoute };

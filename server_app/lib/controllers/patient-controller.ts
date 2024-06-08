@@ -12,9 +12,12 @@ class PatientController implements Controller {
             const token = req.headers.authorization!.split(" ")[1];
             const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
             const role = (<any>verifiedUser).role;
-            if(role==="patient" || role==="basic") return res.status(401).json({ error: { message: "Unauthorized Access." } })
-            const patients = await Patient.find();
-            return res.status(200).json (patients)  
+            if(role==="doctor" || role==="staff" || role==="sysAdmin") {
+                const patients = await Patient.find();
+                return res.status(200).json (patients)  
+            }
+            return res.status(401).json({ error: { message: "Unauthorized Access." } })
+            
       }
     catch (err: any) {
             const errorMessage: string = (err as Error).message;
@@ -27,8 +30,26 @@ class PatientController implements Controller {
     get(req: Request, res: Response): Promise<Response>{
         throw new Error("Method not implemented.");
     }
-    add(req: Request, res: Response): Promise<Response> {
-        throw new Error("Method not implemented.");
+    async add(req: Request, res: Response): Promise<Response> {
+    /** 
+     * 1. Define role
+     * 2. Add information
+     * 
+    */
+    try {
+            const token = req.headers.authorization!.split(" ")[1];
+            const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
+            const role = (<any>verifiedUser).role;
+            if(role==="patient" || role==="basic") return res.status(401).json({ error: { message: "Unauthorized Access." } })
+            const patients = await Patient.find();
+            return res.status(200).json (patients)  
+      }
+    catch (err: any) {
+            const errorMessage: string = (err as Error).message;
+            logger.error(errorMessage);
+            return res.status(500).json({ errorMessage });
+      }
+        
     }
     update(req: Request, res: Response):Promise<Response>{
         throw new Error("Method not implemented.");
