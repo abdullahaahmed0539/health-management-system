@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
+
   firstName: {
     type: String,
     require: [true, "First name is required."],
@@ -47,6 +48,21 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
     require: [true, "Role is required."],
+  },
+  city: {
+    type: String,
+    require: [true, "City is required."],
+    trim: true,
+  },
+  country: {
+    type: String,
+    require: [true, "Country is required."],
+    trim: true,
+  },
+  gender: {
+    type: String,
+    require: [true, "Gender is required."],
+    trim: true,
   },
 });
 
