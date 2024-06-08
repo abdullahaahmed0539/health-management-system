@@ -14,6 +14,7 @@ app.use(cors());
 app.use(morgan("tiny"));
 
 app.use(`${base_url}/${authRoute}`, AuthRouter);
+app.use(`${base_url}/${authRoute}`, AuthRouter);
 
 // app.get("*", (req, res) => {});
 

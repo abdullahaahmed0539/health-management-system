@@ -9,17 +9,16 @@ class AuthController {
 
   public async register(req: Request, res: Response): Promise<Response> {
     try {
-      const { firstName, lastName, address, email, password } = req.body;
+      const { firstName, lastName, email, password } = req.body;
       let newUser = new User({
         firstName,
         lastName,
         email,
-        password,
-        address
       });
-      newUser.hashedPassword = generate(newUser.password as string);
-      const userCreated: any = await newUser.save();
-      return res.status(201).json(userCreated);
+      newUser.hashedPassword = generate(password);
+      newUser.role = 'basic'
+      await newUser.save();
+      return res.sendStatus(201);
     }
     catch (err: any) {
       const errorMessage: string = (err as Error).message;
@@ -39,7 +38,7 @@ class AuthController {
         {
           email: user.email,
           timeStamp: Date.now(),
-          // userType: user.userType,
+          role: user.role,
         },
         process.env.JWT_PVT_KEY as string,
         { expiresIn: process.env.JWT_PVT_EXPIRY }
@@ -48,8 +47,8 @@ class AuthController {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        address: user.address,
         token,
+        role: user.role
       };
       return res.status(200).json(responseObj);
     }

@@ -6,6 +6,8 @@ const router: Router = express.Router();
 const authController: AuthController = new AuthController();
 
 const authRoute: string = "auth";
+
+
 router.route("/register").post(authController.register);
 router.route("/login").post(authController.login);
 
