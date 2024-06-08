@@ -27,9 +27,26 @@ const userSchema = new mongoose.Schema({
     require: [true, "Hashed Password is required."],
     trim: true,
   },
-  address: {
+  addresses: {
+    type: [String],
+    trim: true,
+  },
+  dateOfBirth: {
+    type: Date,
+    trim: true,
+  },
+  designations: {
+    type: [String],
+    trim: true,
+  },
+  phoneNumbers: {
+    type: [String],
+    trim: true,
+  },
+  role: {
     type: String,
     trim: true,
+    require: [true, "Role is required."],
   },
 });
 
