@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-
   firstName: {
     type: String,
     require: [true, "First name is required."],
@@ -36,7 +35,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
     trim: true,
   },
-  designations: {
+  designation: {
     type: [String],
     trim: true,
   },

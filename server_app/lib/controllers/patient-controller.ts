@@ -52,7 +52,7 @@ class PatientController implements Controller {
                     newPatient.userId= user._id as unknown as string;
                     await newPatient.save();
                     user.hashedPassword = null;
-                    user.role = "patient";
+                    if(user.role === 'basic') user.role = "patient";
                     const responseObj = { "patient": user };
                     return res.status(201).json(responseObj);
 

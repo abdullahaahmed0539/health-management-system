@@ -10,6 +10,8 @@ const userRoute: string = "users";
 
 router.route("/").get(checkAuth, userController.getAll);
 router.route("/:userId").get(checkAuth, userController.get);
+router.route("/:userId").put(checkAuth, userController.update);
+router.route("/:userId").delete(checkAuth, userController.delete);
 
 
 
