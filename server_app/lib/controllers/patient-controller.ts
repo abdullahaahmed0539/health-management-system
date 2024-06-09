@@ -33,15 +33,7 @@ class PatientController implements Controller {
         throw new Error("Method not implemented.");
     }
     async add(req: Request, res: Response): Promise<Response> {
-    /** 
-     * 
-     * 1. check authoriztion
-     * 2. check if patient is already exist or not
-     * 3. if yes, error : already exist
-     * 4. create a patient record
-     * 
-    */
-    try {
+        try {
             const token = req.headers.authorization!.split(" ")[1];
             const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
             const role = (<any>verifiedUser).role;
@@ -59,9 +51,10 @@ class PatientController implements Controller {
                     const newPatient = new Patient ();
                     newPatient.userId= user._id as unknown as string;
                     await newPatient.save();
-                    user.hashedPassword= null;
-                    const responseObj= {"patient":user}
-                    return res.status(201).json(responseObj) 
+                    user.hashedPassword = null;
+                    user.role = "patient";
+                    const responseObj = { "patient": user };
+                    return res.status(201).json(responseObj);
 
                 }
 
@@ -76,7 +69,8 @@ class PatientController implements Controller {
                     newUser.phoneNumbers.push(phoneNumber);
                     newUser.city= city;
                     newUser.country=country;
-                    newUser.hashedPassword= generate("patient123")
+                    newUser.hashedPassword = generate("patient123");
+                    newUser.role = 'patient';
                     await newUser.save();
                     const newPatient = new Patient ();
                     newPatient.userId= newUser._id as unknown as string;
@@ -90,12 +84,11 @@ class PatientController implements Controller {
 
             return res.status(401).json({ error: { message: "Unauthorized Access." } }) 
         }
-      
-    catch (err: any) {
+        catch (err: any) {
             const errorMessage: string = (err as Error).message;
             logger.error(errorMessage);
             return res.status(500).json({ errorMessage });
-      }
+        }
         
     }
     update(req: Request, res: Response):Promise<Response>{
