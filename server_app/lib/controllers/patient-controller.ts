@@ -15,7 +15,7 @@ class PatientController implements Controller {
             const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
             const role = (<any>verifiedUser).role;
             if(role==="doctor" || role==="staff" || role==="sysAdmin") {
-                const patients = await Patient.find();
+                const patients = await User.find({role: 'patient'}).select("-hashedPassword");
                 return res.status(200).json (patients)  
             }
             return res.status(401).json({ error: { message: "Unauthorized Access." } })
