@@ -13,7 +13,7 @@ class UserController implements Controller {
       const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
       const role = (<any>verifiedUser).role;
       if (role === "sysAdmin") {
-        const users = await User.find();
+        const users = await User.find().select("-hashedPassword");;
         return res.status(200).json(users);
       }
       return res
@@ -26,8 +26,33 @@ class UserController implements Controller {
     }
   }
 
-  get(req: Request, res: Response): Promise<Response> {
-    throw new Error("Method not implemented.");
+  async get(req: Request, res: Response): Promise<Response> {
+      try {
+            const userId = req.params.userId
+            const token = req.headers.authorization!.split(" ")[1];
+            const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
+            const role = (<any>verifiedUser).role;
+            const idFromToken = (await User.findOne({ email: (<any>verifiedUser).email as string }))?.id;
+            if (role === "sysAdmin" || (role === 'patient' && userId === idFromToken)) {
+                const user = await User.findById(userId).select("-hashedPassword");;
+                if(!user) return res
+                  .status(404)
+                    .json({ error: { message: `No user with userId ${userId} found.` } });
+                
+                return res
+                  .status(200)
+                  .json({
+                    user
+                  });
+            }
+            return res
+                .status(401)
+                .json({ error: { message: "Unauthorized Access." } });
+    } catch (err: any) {
+      const errorMessage: string = (err as Error).message;
+      logger.error(errorMessage);
+      return res.status(500).json({ errorMessage });
+    }
   }
   async add(req: Request, res: Response): Promise<Response> {
     try {

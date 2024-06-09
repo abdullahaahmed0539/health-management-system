@@ -9,7 +9,7 @@ const userRoute: string = "users";
 
 
 router.route("/").get(checkAuth, userController.getAll);
-// router.route("/").post(checkAuth, patientController.add);
+router.route("/:userId").get(checkAuth, userController.get);
 
 
 
