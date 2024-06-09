@@ -101,7 +101,7 @@ class UserController implements Controller {
                 : userToBeUpdated.gender;
 
                 await userToBeUpdated.updateOne(userToBeUpdated);
-                return res.status(204).json({
+                return res.status(201).json({
                 user: userToBeUpdated,
                 });
             }
@@ -126,7 +126,7 @@ class UserController implements Controller {
            user.country = country ? country : user.country;
            user.gender = gender ? gender : user.gender;
            await user.updateOne(user);
-           return res.status(204).json({
+           return res.status(201).json({
              user,
            });
        }
@@ -141,9 +141,36 @@ class UserController implements Controller {
     }
   }
     
-  delete(req: Request, res: Response): Promise<Response> {
-    throw new Error("Method not implemented.");
-  }
+  async delete(req: Request, res: Response): Promise<Response> {
+      try {
+        const userId = req.params.userId;
+        const token = req.headers.authorization!.split(" ")[1];
+        const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
+        const role = (<any>verifiedUser).role;
+        if (role === "sysAdmin") {
+            const userToBeDelete = await User.findById(userId).select("-hashedPassword");
+            if (userToBeDelete && userToBeDelete.email !== process.env.ADMIN_EMAIL) {
+                 await Patient.deleteOne({ userId: userToBeDelete.id });
+                 await userToBeDelete.deleteOne();
+                 return res.sendStatus(204);
+            }
+            else {
+                return res
+                  .status(401)
+                  .json({ error: { message: "Forbidden to delete sysAdmin." } });
+            }
+               
+        }
+        return res
+            .status(401)
+            .json({ error: { message: "Unauthorized Access." } });
+      }
+      catch (err: any) {
+        const errorMessage: string = (err as Error).message;
+        logger.error(errorMessage);
+        return res.status(500).json({ errorMessage });
+      }
+    }
 }
 
 export { UserController };
