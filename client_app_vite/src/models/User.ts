@@ -2,13 +2,17 @@ export type UserProfileToken = {
   firstName: string;
   lastName: string;
   email: string;
+  password: string;
+  address: string;
+  role: null;
   token: string;
-  role: string; // enum maybe
 };
 
 export type UserProfile = {
   firstName: string;
   lastName: string;
   email: string;
-  role: string;
+  password: string;
+  address: string;
+  role: null;
 };

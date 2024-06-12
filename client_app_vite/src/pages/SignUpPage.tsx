@@ -13,6 +13,7 @@ type RegisterFormsInputs = {
   password: string;
   firstName: string;
   lastName: string;
+  address: string;
 };
 
 const validation = Yup.object().shape({
@@ -20,6 +21,7 @@ const validation = Yup.object().shape({
   password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
   firstName: Yup.string().required("First name is required"),
   lastName: Yup.string().required("Last name is required"),
+  address: Yup.string().required("Address is required"),
 });
 
 const SignUpPage = (props: Props) => {
@@ -32,7 +34,7 @@ const SignUpPage = (props: Props) => {
 
   const handleSignUp = (form: RegisterFormsInputs) => {
     console.log(form);
-    registerApi(form.email, form.password, form.firstName, form.lastName);
+    registerUser(form.email, form.password, form.firstName, form.lastName, form.address);
   };
 
   return (
@@ -103,6 +105,22 @@ const SignUpPage = (props: Props) => {
                   />
                   {errors.lastName ? (
                     <p className="text-danger">{errors.lastName.message}</p>
+                  ) : (
+                    ""
+                  )}
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="address" className="form-label">Address</label>
+                  <input
+                    type="address"
+                    className="form-control"
+                    id="address"
+                    placeholder="address"
+                    required
+                    {...register("address")}
+                  />
+                  {errors.address ? (
+                    <p className="text-danger">{errors.address.message}</p>
                   ) : (
                     ""
                   )}

@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { UserProfile, UserProfileToken } from "../models/User";
+import { UserProfile } from "../models/User";
 import { useNavigate } from "react-router-dom";
 import { loginApi, registerApi } from "../services/AuthService";
 import { toast } from "react-toastify";
@@ -13,7 +13,8 @@ type UserContextType = {
     firstName: string,
     lastName: string,
     email: string,
-    password: string
+    password: string,
+    address: string,
   ) => void;
   loginUser: (email: string, password: string) => void;
   logoutUser: () => void;
@@ -45,22 +46,28 @@ export const UserProvider = ({ children }: Props) => {
     firstName: string,
     lastName: string,
     email: string,
-    password: string
+    password: string,
+    address: string
   ) => {
-    await registerApi(firstName, lastName, email, password)
+    await registerApi(firstName, lastName, email, password, address)
       .then((res) => {
         if (res) {
+          console.log("test");
           localStorage.setItem("token", res?.data.token);
           const userObj = {
             firstName: res?.data.firstName,
             lastName: res?.data.lastName,
             email: res?.data.email,
+            password: res?.data.password,
+            address: res?.data.address,
             role: res?.data.role,
           };
           localStorage.setItem("user", JSON.stringify(userObj));
           setToken(res?.data.token!);
           setUser(userObj!);
-          toast.success("Login successful");
+          console.log("test");
+          toast.success("Registration successful");
+          console.log("test");
           navigate("/");
         }
       })
@@ -70,19 +77,24 @@ export const UserProvider = ({ children }: Props) => {
   const loginUser = async (email: string, password: string) => {
     await loginApi(email, password)
       .then((res) => {
+        console.log("test");
         if (res) {
           localStorage.setItem("token", res?.data.token);
           const userObj = {
             firstName: res?.data.firstName,
             lastName: res?.data.lastName,
             email: res?.data.email,
+            password: res?.data.password,
+            address: res?.data.address,
             role: res?.data.role,
           };
           localStorage.setItem("user", JSON.stringify(userObj));
           setToken(res?.data.token!);
+          console.log(userObj);
           setUser(userObj!);
+          console.log("test1");
           toast.success("Login successful");
-          navigate("/");
+          navigate("/search");
         }
       })
       .catch((e) => toast.warning("Server error occurred"));
@@ -97,7 +109,7 @@ export const UserProvider = ({ children }: Props) => {
     localStorage.removeItem("token");
     setUser(null);
     setToken(null);
-    navigate("/");
+    navigate("/search");
   };
 
   return (
