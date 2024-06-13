@@ -17,10 +17,10 @@ type RegisterFormsInputs = {
 };
 
 const validation = Yup.object().shape({
-  email: Yup.string().email("Invalid email format").required("Email is required"),
-  password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
   firstName: Yup.string().required("First name is required"),
   lastName: Yup.string().required("Last name is required"),
+  email: Yup.string().email("Invalid email format").required("Email is required"),
+  password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
   address: Yup.string().required("Address is required"),
 });
 
@@ -34,7 +34,7 @@ const SignUpPage = (props: Props) => {
 
   const handleSignUp = (form: RegisterFormsInputs) => {
     console.log(form);
-    registerUser(form.email, form.password, form.firstName, form.lastName, form.address);
+    registerUser(form.firstName, form.lastName, form.email, form.password, form.address);
   };
 
   return (

@@ -8,6 +8,8 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SearchPage from "./pages/SearchPage";
 import SignUpPage from "./pages/SignUpPage";
+import ProfilePage from "./pages/ProfilePage.tsx";
+import ProtectedRoute from "./routes/ProtectedRoute.tsx";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +20,7 @@ const router = createBrowserRouter([
         {path: "search", element: <SearchPage/>},
         {path: "login", element: <LoginPage/>},
         {path: "signup", element: <SignUpPage/>},
+        {path: "profile", element: <ProtectedRoute><ProfilePage/></ProtectedRoute>}
     ],
   }
 ]);

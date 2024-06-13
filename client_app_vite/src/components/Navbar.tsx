@@ -18,12 +18,21 @@ const Navbar = (props: Props) => {
           <Nav.Link to="/search" as={NavLink}>
             Search
           </Nav.Link>
+          {isLoggedIn() ? (
+            <Nav.Link to="/profile" as={NavLink}>
+              Profile
+            </Nav.Link>
+          ) : (
+            <></>
+          )}
         </Nav>
         <Nav className="ms-auto">
           {isLoggedIn() ? (
-            <Button onClick={logoutUser} className="ms-2">
-              Logout
-            </Button>
+            <>
+              <Button onClick={logoutUser} className="ms-2">
+                Logout
+              </Button>
+            </>
           ) : (
             <>
               <Nav.Link to="/login" as={NavLink} className="ms-2">
