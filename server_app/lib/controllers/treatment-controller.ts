@@ -177,8 +177,37 @@ class TreatmentController implements Controller {
         return res.status(500).json({ errorMessage });
       }
   }
-  delete(req: Request, res: Response): Promise<Response> {
-    throw new Error("Method not implemented.");
+  async delete(req: Request, res: Response): Promise<Response> {
+    try {
+      const token = req.headers.authorization!.split(" ")[1];
+      const userId = req.params.patientId;
+      const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
+      const role = (<any>verifiedUser).role;
+      const treatmentId = req.params.treatmentId;
+
+      if (role === "doctor" || role === "sysAdmin") {
+        const patient = await Patient.findOne({ userId });
+        if (!patient)
+          return res.status(404).json({
+            error: {
+              message: `No patient with user id ${userId} found.`,
+            },
+          });
+        const deletedArr = patient.treatmentHistory.filter(
+          (x) => x._id.toString() !== treatmentId
+        );
+          patient.treatmentHistory = deletedArr;
+        await patient.updateOne(patient);
+        return res.status(204).json();
+      }
+      return res
+        .status(401)
+        .json({ error: { message: "Unauthorized Access." } });
+    } catch (err: any) {
+      const errorMessage: string = (err as Error).message;
+      logger.error(errorMessage);
+      return res.status(500).json({ errorMessage });
+    }
   }
 }
 
