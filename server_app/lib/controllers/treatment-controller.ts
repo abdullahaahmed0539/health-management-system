@@ -26,7 +26,7 @@ class TreatmentController implements Controller {
               message: `No patient with userId ${userId} found.`,
             },
           });
-        return res.status(200).json(patient.treatmentHistory);
+          return res.status(200).json({ treatment: patient.treatmentHistory });
       }
       return res.status(401).json({
         error: {
@@ -51,21 +51,21 @@ class TreatmentController implements Controller {
         await User.findOne({ email: (<any>verifiedUser).email as string })
       )?.id;
 
-      if (role === "sysAdmin" || role === "doctor" || userId === idFromToken) {
-        const patient = await Patient.findOne({ userId });
-        if (!patient)
-          return res.status(404).json({
-            error: {
-              message: `No patient with userId ${userId} found.`,
-            },
-          });
-        return res
-          .status(200)
-          .json(
-            patient.treatmentHistory.find(
-              (x) => x._id.toString() === treatmentId
-            )
-          );
+        if (role === "sysAdmin" || role === "doctor" || userId === idFromToken) {
+            const patient = await Patient.findOne({ userId });
+            if (!patient)
+                return res.status(404).json({
+                    error: {
+                        message: `No patient with userId ${userId} found.`,
+                    },
+                });
+            return res
+                .status(200)
+                .json({
+                    treatment: patient.treatmentHistory.find(
+                        (x) => x._id.toString() === treatmentId
+                    )
+      });
       }
       return res.status(401).json({
         error: {
@@ -121,7 +121,7 @@ class TreatmentController implements Controller {
         patient.treatmentHistory.push(newTreatment);
         await patient.updateOne(patient);
         return res.status(201).json({
-          'treatment': newTreatment
+          treatment: newTreatment
         });
       }
       return res
@@ -163,7 +163,7 @@ class TreatmentController implements Controller {
               
               await patient.updateOne(patient);
               return res.status(201).json({
-                'treatment': toBeUpdatedTreatment,
+                treatment: toBeUpdatedTreatment,
               });
               
           }
