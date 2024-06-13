@@ -59,7 +59,7 @@ class GuardianController implements Controller {
             },
           });
         return res.status(200).json({
-          treatment: patient.guardianInfo.find(
+          guardian: patient.guardianInfo.find(
             (x) => x._id.toString() === guardianId
           ),
         });
@@ -128,10 +128,49 @@ class GuardianController implements Controller {
       return res.status(500).json({ errorMessage });
     }
   }
-  update(req: Request, res: Response): Promise<Response> {
-    throw new Error("Method not implemented.");
+
+  async update(req: Request, res: Response): Promise<Response> {
+    try {
+      const token = req.headers.authorization!.split(" ")[1];
+      const userId = req.params.patientId;
+      const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
+      const role = (<any>verifiedUser).role;
+      const guardianId = req.params.guardianId;
+
+      if (role === "doctor" || role === "sysAdmin") {
+        const { name, email, phone, relation } =
+          req.body;
+        const patient = await Patient.findOne({ userId });
+        if (!patient)
+          return res.status(404).json({
+            error: {
+              message: `No patient with user id ${userId} found.`,
+            },
+          });
+        let toBeUpdatedGuardian = patient.guardianInfo.find(
+          (x) => x._id.toString() === guardianId
+        );
+        toBeUpdatedGuardian.name = name ?? toBeUpdatedGuardian.name;
+        toBeUpdatedGuardian.email = email ?? toBeUpdatedGuardian.email;
+        toBeUpdatedGuardian.phone = phone ?? toBeUpdatedGuardian.phone;
+        toBeUpdatedGuardian.relation = relation ?? toBeUpdatedGuardian.relation;
+       
+
+        await patient.updateOne(patient);
+        return res.status(201).json({
+          guardians: toBeUpdatedGuardian,
+        });
+      }
+      return res
+        .status(401)
+        .json({ error: { message: "Unauthorized Access." } });
+    } catch (err: any) {
+      const errorMessage: string = (err as Error).message;
+      logger.error(errorMessage);
+      return res.status(500).json({ errorMessage });
+    }
   }
-  delete(req: Request, res: Response): Promise<Response> {
+  async delete(req: Request, res: Response): Promise<Response> {
     throw new Error("Method not implemented.");
   }
 }

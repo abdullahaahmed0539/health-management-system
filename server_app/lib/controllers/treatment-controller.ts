@@ -177,6 +177,7 @@ class TreatmentController implements Controller {
         return res.status(500).json({ errorMessage });
       }
   }
+  
   async delete(req: Request, res: Response): Promise<Response> {
     try {
       const token = req.headers.authorization!.split(" ")[1];
