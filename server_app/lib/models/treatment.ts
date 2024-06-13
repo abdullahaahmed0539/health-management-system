@@ -1,27 +1,33 @@
-class Treatment {
-  public treatmentNumber: number;
-  public name: string;
-  public diseaseName: string;
-  public doctorId: string;
-  public doctorName: string;
-  public treatmentDate: Date;
+import mongoose from "mongoose";
 
-  constructor(
-    treatmentNumber: number,
-    name: string,
-    diseaseName: string,
-    doctorId: string,
-    doctorName: string,
-    treatmentDate: Date
-  ) {
-    this.treatmentNumber = treatmentNumber;
-    this.name = name;
-    this.diseaseName = diseaseName;
-    this.doctorId = doctorId;
-    this.doctorName = doctorName;
-    this.treatmentDate = treatmentDate;
-  }
-    
-}
+const treatmentSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    require: [true, "Treatment name is required."],
+    trim: true,
+  },
+  diseaseName: {
+    type: String,
+    require: [true, "Disease name is required."],
+    trim: true,
+  },
+  doctorId: {
+    type: String,
+    require: [true, "Doctor Id is required."],
+    trim: true,
+  },
+  doctorName: {
+    type: String,
+    require: [true, "Doctor name is required."],
+    trim: true,
+  },
+  treatmentDate: {
+    type: Date,
+    require: [true, "Treatment date is required."],
+    trim: true,
+  },
+});
+
+const Treatment = mongoose.model("treatments", treatmentSchema);
 
 export default Treatment;

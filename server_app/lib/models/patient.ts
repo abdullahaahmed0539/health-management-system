@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import Treatment from "./treatment";
 import GuardianContact from "./guardian-contact";
 
@@ -8,12 +8,10 @@ const patientSchema = new mongoose.Schema({
     require: [true, "User Id is required."],
     trim: true,
   },
- 
- 
-  // treatmentHistory: {
-  //   type: [Treatment],
-  //   trim: true,
-  // },
+  treatmentHistory: {
+    type: [Schema.Types.Mixed],
+    trim: true,
+  },
   // guardianInfo: {
   //   type: [GuardianContact],
   //   trim: true,
