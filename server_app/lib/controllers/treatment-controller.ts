@@ -121,7 +121,7 @@ class TreatmentController implements Controller {
         patient.treatmentHistory.push(newTreatment);
         await patient.updateOne(patient);
         return res.status(201).json({
-          patient,
+          'treatment': newTreatment
         });
       }
       return res
@@ -134,8 +134,48 @@ class TreatmentController implements Controller {
     }
   }
     
-  update(req: Request, res: Response): Promise<Response> {
-    throw new Error("Method not implemented.");
+  async update(req: Request, res: Response): Promise<Response> {
+      try {
+          const token = req.headers.authorization!.split(" ")[1];
+        const userId = req.params.patientId;
+        const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
+          const role = (<any>verifiedUser).role;
+                const treatmentId = req.params.treatmentId;
+
+          if (role === "doctor" || role === "sysAdmin") {
+              const { name, diseaseName, doctorId, doctorName, treatmentDate } =
+                  req.body;
+              const patient = await Patient.findOne({ userId });
+               if (!patient)
+                 return res.status(404).json({
+                   error: {
+                     message: `No patient with user id ${userId} found.`,
+                   },
+                 });
+              let toBeUpdatedTreatment = patient.treatmentHistory.find(x => x._id.toString() === treatmentId)
+              toBeUpdatedTreatment.name = name ?? toBeUpdatedTreatment.name;
+              toBeUpdatedTreatment.diseaseName = diseaseName ?? toBeUpdatedTreatment.diseaseName;
+              toBeUpdatedTreatment.doctorId = doctorId ?? toBeUpdatedTreatment.doctorId
+              toBeUpdatedTreatment.doctorName =
+                doctorName ?? toBeUpdatedTreatment.doctorName;
+              toBeUpdatedTreatment.treatmentDate =
+                  treatmentDate ?? toBeUpdatedTreatment.treatmentDate;
+              
+              await patient.updateOne(patient);
+              return res.status(201).json({
+                'treatment': toBeUpdatedTreatment,
+              });
+              
+          }
+          return res
+            .status(401)
+            .json({ error: { message: "Unauthorized Access." } });
+      }
+      catch (err: any) {
+        const errorMessage: string = (err as Error).message;
+        logger.error(errorMessage);
+        return res.status(500).json({ errorMessage });
+      }
   }
   delete(req: Request, res: Response): Promise<Response> {
     throw new Error("Method not implemented.");
