@@ -1,6 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import Treatment from "./treatment";
-import GuardianContact from "./guardian-contact";
 
 const patientSchema = new mongoose.Schema({
   userId: {
@@ -12,10 +10,10 @@ const patientSchema = new mongoose.Schema({
     type: [Schema.Types.Mixed],
     trim: true,
   },
-  // guardianInfo: {
-  //   type: [GuardianContact],
-  //   trim: true,
-  // },
+  guardianInfo: {
+    type: [Schema.Types.Mixed],
+    trim: true,
+  },
 });
 
 const Patient = mongoose.model("patients", patientSchema);

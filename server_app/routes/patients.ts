@@ -1,13 +1,13 @@
 import express, { Router } from "express";
 import { PatientController } from "../lib/controllers/patient-controller";
 import { TreatmentController } from "../lib/controllers/treatment-controller";
-// import { GuardianController } from "../lib/controllers/guardian-controller";
+import { GuardianController } from "../lib/controllers/guardian-controller";
 import checkAuth from "../lib/middlewares/auth";
 
 const router: Router = express.Router();
 const patientController: PatientController = new PatientController();
 const treatmentController: TreatmentController = new TreatmentController();
-// const guardianController: GuardianController = new GuardianController();
+const guardianController: GuardianController = new GuardianController();
 
 const patientRoute: string = "patients";
 
@@ -19,9 +19,11 @@ router.route("/:patientId/treatments/:treatmentId").get(checkAuth, treatmentCont
 router.route("/:patientId/treatments").post(checkAuth, treatmentController.add);
 router.route("/:patientId/treatments/:treatmentId").put(checkAuth, treatmentController.update);
 router.route("/:patientId/treatments/:treatmentId").delete(checkAuth, treatmentController.delete);
-// router.route("/:patientId/guardians").post(checkAuth, guardianController.);
-// router.route("/:patientId/guardians/:guardianId").put(checkAuth, guardianController.);
-// router.route("/:patientId/guardians/:guardianId").delete(checkAuth, guardianController.);
+router.route("/:patientId/guardians/").get(checkAuth, guardianController.getAll);
+router.route("/:patientId/guardians/:guardianId").get(checkAuth, guardianController.get);
+router.route("/:patientId/guardians").post(checkAuth, guardianController.add);
+router.route("/:patientId/guardians/:guardianId").put(checkAuth, guardianController.update);
+router.route("/:patientId/guardians/:guardianId").delete(checkAuth, guardianController.delete);
 
 
 

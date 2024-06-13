@@ -8,7 +8,29 @@ import User from "../models/user";
 class GuardianController implements Controller {
   async getAll(req: Request, res: Response): Promise<Response> {
     try {
-      throw new Error("Method not implemented.");
+      const token = req.headers.authorization!.split(" ")[1];
+      const userId = req.params.patientId;
+      const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
+      const role = (<any>verifiedUser).role;
+      const idFromToken = (
+        await User.findOne({ email: (<any>verifiedUser).email as string })
+      )?.id;
+
+      if (role === "sysAdmin" || role === "doctor" || userId === idFromToken) {
+        const patient = await Patient.findOne({ userId });
+        if (!patient)
+          return res.status(404).json({
+            error: {
+              message: `No patient with userId ${userId} found.`,
+            },
+          });
+        return res.status(200).json({ guardians: patient.guardianInfo });
+      }
+      return res.status(401).json({
+        error: {
+          message: `Unauthorized access.`,
+        },
+      });
     } catch (err: any) {
       const errorMessage: string = (err as Error).message;
       logger.error(errorMessage);
