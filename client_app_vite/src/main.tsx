@@ -8,8 +8,8 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SearchPage from "./pages/SearchPage";
 import SignUpPage from "./pages/SignUpPage";
-import ProfilePage from "./pages/ProfilePage.tsx";
-import ProtectedRoute from "./routes/ProtectedRoute.tsx";
+import ProfilePage from "./pages/Profile/ProfilePage";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
