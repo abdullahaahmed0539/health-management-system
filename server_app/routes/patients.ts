@@ -9,11 +9,15 @@ const patientController: PatientController = new PatientController();
 const treatmentController: TreatmentController = new TreatmentController();
 const guardianController: GuardianController = new GuardianController();
 
+
 const patientRoute: string = "patients";
 
 
 router.route("/").get(checkAuth, patientController.getAll);
 router.route("/").post(checkAuth, patientController.add);
+router.route("/:patientId").put(checkAuth, patientController.update);
+router.route("/:patientId").delete(checkAuth, patientController.delete);
+router.route("/:patientId").get(checkAuth, patientController.get);
 router.route("/:patientId/treatments").get(checkAuth, treatmentController.getAll);
 router.route("/:patientId/treatments/:treatmentId").get(checkAuth, treatmentController.get);
 router.route("/:patientId/treatments").post(checkAuth, treatmentController.add);
