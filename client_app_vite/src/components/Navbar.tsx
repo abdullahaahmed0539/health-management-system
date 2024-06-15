@@ -15,13 +15,15 @@ const Navbar = (props: Props) => {
           <Nav.Link to="/" as={NavLink}>
             Home
           </Nav.Link>
-          <Nav.Link to="/search" as={NavLink}>
-            Search
-          </Nav.Link>
           {isLoggedIn() ? (
-            <Nav.Link to="/profile" as={NavLink}>
-              Profile
-            </Nav.Link>
+            <>
+              <Nav.Link to="/search" as={NavLink}>
+                Search
+              </Nav.Link>
+              <Nav.Link to="/profile" as={NavLink}>
+                Profile
+              </Nav.Link>
+            </>
           ) : (
             <></>
           )}
