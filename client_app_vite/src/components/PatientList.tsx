@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchPatients, deletePatient } from '../components/PatientService';
+import { fetchPatients, deletePatient } from '../services/PatientService';
 import { Link, useNavigate } from 'react-router-dom';
 
 interface Patient {

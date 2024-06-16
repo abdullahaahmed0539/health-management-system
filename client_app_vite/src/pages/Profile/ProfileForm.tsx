@@ -3,19 +3,23 @@ import { Button, Col, Form, Row, Stack } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Link } from "react-router-dom";
+import CreateableReactSelect from "react-select/creatable";
+import { ProfileData, Tag } from "../../models/User";
 
-type Props = {};
+type ProfileFormProps = {
+  onSubmit: (data: ProfileData) => void;
+};
 
-const ProfileForm = (props: Props) => {
+const ProfileForm = ({ onSubmit }: ProfileFormProps) => {
   const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
-
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
   const addressRef = useRef<HTMLInputElement>(null);
   const cityRef = useRef<HTMLInputElement>(null);
   const countryRef = useRef<HTMLInputElement>(null);
   const phoneNumberRef = useRef<HTMLInputElement>(null);
-  const designationRef = useRef<HTMLInputElement>(null);
+  const designationsRef = useRef<HTMLInputElement>(null);
   const dateOfBirthRef = useRef<HTMLInputElement>(null);
   const genderMaleRef = useRef<HTMLInputElement>(null);
   const genderFemaleRef = useRef<HTMLInputElement>(null);
@@ -23,24 +27,29 @@ const ProfileForm = (props: Props) => {
   const handleDateChange = (date: Date | null) => {
     setDateOfBirth(date);
     if (dateOfBirthRef.current) {
-      dateOfBirthRef.current.value = date ? date.toISOString().split('T')[0] : '';
+      dateOfBirthRef.current.value = date
+        ? date.toISOString().split("T")[0]
+        : "";
     }
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = {
-      firstName: firstNameRef.current?.value,
-      lastName: lastNameRef.current?.value,
-      address: addressRef.current?.value,
-      city: cityRef.current?.value,
-      country: countryRef.current?.value,
-      dateOfBirth: dateOfBirthRef.current?.value,
-      gender: genderMaleRef.current?.checked ? 'Male' : genderFemaleRef.current?.checked ? 'Female' : '',
-      phoneNumber: phoneNumberRef.current?.value,
-      designation: designationRef.current?.value,
-    };
-    console.log("Form data:", formData);
+    onSubmit({
+      firstName: firstNameRef.current!.value,
+      lastName: lastNameRef.current!.value,
+      address: addressRef.current!.value,
+      city: cityRef.current!.value,
+      country: countryRef.current!.value,
+      dateOfBirth: dateOfBirthRef.current!.value,
+      gender: genderMaleRef.current!.checked
+        ? "Male"
+        : genderFemaleRef.current!.checked
+        ? "Female"
+        : "",
+      phoneNumber: phoneNumberRef.current!.value,
+      designations: [],
+    });
   };
 
   return (
@@ -119,7 +128,9 @@ const ProfileForm = (props: Props) => {
                   <input
                     ref={dateOfBirthRef}
                     type="hidden"
-                    value={dateOfBirth ? dateOfBirth.toISOString().split('T')[0] : ''}
+                    value={
+                      dateOfBirth ? dateOfBirth.toISOString().split("T")[0] : ""
+                    }
                   />
                 </div>
               </Form.Group>
@@ -162,12 +173,21 @@ const ProfileForm = (props: Props) => {
             />
           </Form.Group>
           <Form.Group className="mb-3" controlId="designation">
-            <Form.Label>Designation</Form.Label>
-            <Form.Control
-              ref={designationRef}
+            <Form.Label>Designations</Form.Label>
+            <CreateableReactSelect
+              value={selectedTags.map((tag) => {
+                return { name: tag.name, value: tag.id };
+              })}
+              onChange={(tags) => {
+                setSelectedTags(
+                  tags.map((tag) => {
+                    return { name: tag.name, id: tag.value };
+                  })
+                );
+              }}
+              isMulti
               required
-              type="text"
-              placeholder="Enter designation"
+              placeholder="Enter designations"
             />
           </Form.Group>
           <Stack direction="horizontal" gap={2} className="justify-content-end">
