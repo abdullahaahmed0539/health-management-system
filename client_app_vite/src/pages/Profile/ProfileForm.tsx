@@ -5,16 +5,28 @@ import "react-datepicker/dist/react-datepicker.css";
 import { Link } from "react-router-dom";
 import CreateableReactSelect from "react-select/creatable";
 import { ProfileData, Tag } from "../../models/User";
+import RoleDropdown, { Role } from "../../components/RoleDropdown";
+import { v4 as uuidV4 } from "uuid";
 
 type ProfileFormProps = {
   onSubmit: (data: ProfileData) => void;
-};
+  onAddTag: (tag: Tag) => void;
+  availableTags: Tag[];
+} & Partial<ProfileData>;
 
-const ProfileForm = ({ onSubmit }: ProfileFormProps) => {
+const ProfileForm = ({
+  onSubmit,
+  onAddTag,
+  availableTags,
+}: ProfileFormProps) => {
   const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+
+  const roleRef = useRef<HTMLInputElement>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
   const addressRef = useRef<HTMLInputElement>(null);
   const cityRef = useRef<HTMLInputElement>(null);
   const countryRef = useRef<HTMLInputElement>(null);
@@ -23,6 +35,11 @@ const ProfileForm = ({ onSubmit }: ProfileFormProps) => {
   const dateOfBirthRef = useRef<HTMLInputElement>(null);
   const genderMaleRef = useRef<HTMLInputElement>(null);
   const genderFemaleRef = useRef<HTMLInputElement>(null);
+
+  const handleSelectRole = (role: Role) => {
+    setSelectedRole(role);
+    console.log(`Selected role: ${role}`);
+  };
 
   const handleDateChange = (date: Date | null) => {
     setDateOfBirth(date);
@@ -36,6 +53,7 @@ const ProfileForm = ({ onSubmit }: ProfileFormProps) => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     onSubmit({
+      role: roleRef.current!.value,
       firstName: firstNameRef.current!.value,
       lastName: lastNameRef.current!.value,
       address: addressRef.current!.value,
@@ -49,6 +67,24 @@ const ProfileForm = ({ onSubmit }: ProfileFormProps) => {
         : "",
       phoneNumber: phoneNumberRef.current!.value,
       designations: [],
+      email: emailRef.current!.value,
+    });
+    console.log({
+      role: roleRef.current!.value,
+      firstName: firstNameRef.current!.value,
+      lastName: lastNameRef.current!.value,
+      address: addressRef.current!.value,
+      city: cityRef.current!.value,
+      country: countryRef.current!.value,
+      dateOfBirth: dateOfBirthRef.current!.value,
+      gender: genderMaleRef.current!.checked
+        ? "Male"
+        : genderFemaleRef.current!.checked
+        ? "Female"
+        : "",
+      phoneNumber: phoneNumberRef.current!.value,
+      designations: [],
+      email: emailRef.current!.value,
     });
   };
 
@@ -57,6 +93,12 @@ const ProfileForm = ({ onSubmit }: ProfileFormProps) => {
       <div className="row">
         <Stack gap={2}>
           <Row>
+            <Col>
+              <Form.Group className="mb-1" controlId="firstName">
+                <Form.Label>Role</Form.Label>
+                <RoleDropdown onSelectRole={handleSelectRole} />
+              </Form.Group>
+            </Col>
             <Col>
               <Form.Group className="mb-3" controlId="firstName">
                 <Form.Label>First Name</Form.Label>
@@ -80,6 +122,15 @@ const ProfileForm = ({ onSubmit }: ProfileFormProps) => {
               </Form.Group>
             </Col>
           </Row>
+          <Form.Group className="mb-3" controlId="lastName">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              ref={emailRef}
+              required
+              type="text"
+              placeholder="Enter email"
+            />
+          </Form.Group>
           <Form.Group className="mb-3" controlId="address">
             <Form.Label>Address</Form.Label>
             <Form.Control
@@ -175,13 +226,18 @@ const ProfileForm = ({ onSubmit }: ProfileFormProps) => {
           <Form.Group className="mb-3" controlId="designation">
             <Form.Label>Designations</Form.Label>
             <CreateableReactSelect
+              // onCreateOption={(label) => {
+              //   const newTag = { id: uuidV4(), label };
+              //   onAddTag(newTag);
+              //   setSelectedTags((prev) => [...prev, newTag]);
+              // }}
               value={selectedTags.map((tag) => {
-                return { name: tag.name, value: tag.id };
+                return { label: tag.label, value: tag.id };
               })}
               onChange={(tags) => {
                 setSelectedTags(
                   tags.map((tag) => {
-                    return { name: tag.name, id: tag.value };
+                    return { label: tag.label, id: tag.value };
                   })
                 );
               }}

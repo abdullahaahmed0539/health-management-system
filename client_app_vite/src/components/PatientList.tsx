@@ -33,7 +33,7 @@ function PatientsList() {
 
     return (
         <div>
-            <h1>Patients</h1>
+            <h1>Dashboard Patients</h1>
             <Link to="/patients/new">Add New Patient</Link>
             <div>
                 <input

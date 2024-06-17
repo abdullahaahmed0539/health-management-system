@@ -27,7 +27,10 @@ export type RawProfile = {
 
 export type RawProfileData = {
   id: string;
+  role: string;
+  firstName: string;
   lastName: string;
+  email: string;
   address: string;
   city: string;
   country: string;
@@ -38,8 +41,10 @@ export type RawProfileData = {
 }
 
 export type ProfileData = {
+  role: string;
   firstName: string;
   lastName: string;
+  email: string;
   address: string;
   city: string;
   country: string;
@@ -51,7 +56,7 @@ export type ProfileData = {
 
 export type Tag = {
   id: number;
-  name: string;
+  label: string;
 };
 
 
