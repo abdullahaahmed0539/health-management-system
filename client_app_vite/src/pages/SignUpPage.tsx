@@ -127,8 +127,8 @@ const SignUpPage = (props: Props) => {
                 </div>
                 <button type="submit" className="btn btn-primary">Sign Up</button>
               </form>
-              <div className="mt-3">
-                <Link to="/login">Already have an account? Login here</Link>
+              <div className="mt-3"><p>Already have an account? <Link to="/login"> Login here</Link></p>
+                
               </div>
             </div>
           </div>

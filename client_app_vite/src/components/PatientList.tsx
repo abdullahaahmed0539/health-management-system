@@ -15,7 +15,7 @@ function PatientsList() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchPatients().then(setPatients);
+        fetchPatients().then((data) => setPatients(data));
     }, []);
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

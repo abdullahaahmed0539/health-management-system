@@ -1,4 +1,4 @@
-export type UserProfileToken = {
+export type UserToken = {
   firstName: string;
   lastName: string;
   email: string;
@@ -26,7 +26,7 @@ export type RawProfile = {
 } & RawProfileData
 
 export type RawProfileData = {
-  id: string;
+  _id: string;
   role: string;
   firstName: string;
   lastName: string;

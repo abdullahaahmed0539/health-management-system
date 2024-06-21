@@ -1,12 +1,13 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Col, Form, Row, Stack } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Link } from "react-router-dom";
 import CreateableReactSelect from "react-select/creatable";
-import { ProfileData, Tag } from "../../models/User";
+import { ProfileData, RawProfileData, Tag } from "../../models/User";
 import RoleDropdown, { Role } from "../../components/RoleDropdown";
 import { v4 as uuidV4 } from "uuid";
+import { Axios } from "axios";
 
 type ProfileFormProps = {
   onSubmit: (data: ProfileData) => void;
@@ -22,6 +23,25 @@ const ProfileForm = ({
   const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [user, setUser] = useState<RawProfileData | null>(null);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      };
+      console.log(localStorage.getItem("token"));
+      const response = await fetch(
+        "http://localhost:5001/api/v1/users",
+        config
+      );
+      const users = (await response.json()) as RawProfileData;
+      console.log(users);
+      setUser(users);
+    };
+
+    fetchUsers();
+  }, []);
 
   const roleRef = useRef<HTMLInputElement>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);

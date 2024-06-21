@@ -9,12 +9,12 @@ const HomePage = (props: Props) => {
       <PatientsList />
       <ul className="list-group">
         <li className="list-group-item d-flex justify-content-between align-items-center">
-          Patient Record 1
+        Open Treatment 1
         </li>
-        <li className="list-group-item">Patient Record 2</li>
-        <li className="list-group-item">Patient Record 3</li>
-        <li className="list-group-item">Patient Record 4</li>
-        <li className="list-group-item">Patient Record 5</li>
+        <li className="list-group-item">Open Treatment 2</li>
+        <li className="list-group-item">Open Treatment 3</li>
+        <li className="list-group-item">Open Treatment 4</li>
+        <li className="list-group-item">Open Treatment 5</li>
       </ul>
     </div>
   );

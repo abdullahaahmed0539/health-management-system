@@ -3,7 +3,7 @@ import * as Yup from "yup";
 import { useAuth } from "../context/useAuth";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 interface Props {}
 
@@ -38,7 +38,9 @@ const LoginPage = (props: Props) => {
               <h5 className="card-title">Login</h5>
               <form onSubmit={handleSubmit(handleLogin)}>
                 <div className="mb-3">
-                  <label htmlFor="email" className="form-label">Email address</label>
+                  <label htmlFor="email" className="form-label">
+                    Email address
+                  </label>
                   <input
                     type="email"
                     className="form-control"
@@ -48,13 +50,15 @@ const LoginPage = (props: Props) => {
                     {...register("email")}
                   />
                   {errors.email ? (
-                      <p className="">{errors.email.message}</p>
-                    ) : (
-                      ""
-                    )}
+                    <p className="">{errors.email.message}</p>
+                  ) : (
+                    ""
+                  )}
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="password" className="form-label">Password</label>
+                  <label htmlFor="password" className="form-label">
+                    Password
+                  </label>
                   <input
                     type="password"
                     className="form-control"
@@ -64,18 +68,19 @@ const LoginPage = (props: Props) => {
                     {...register("password")}
                   />
                   {errors.password ? (
-                  <p className="">{errors.password.message}</p>
-                ) : (
-                  ""
-                )}
+                    <p className="">{errors.password.message}</p>
+                  ) : (
+                    ""
+                  )}
                 </div>
-                <button type="submit" className="btn btn-primary">Login</button>
+                <button type="submit" className="btn btn-primary">
+                  Login
+                </button>
               </form>
               <div className="mt-3">
-                <Link to="/signup">Forgot password?</Link>
-              </div>
-              <div className="mt-3">
-                <Link to="/signup">Don’t have an account yet?{" "}</Link>
+                <p>
+                  Don’t have an account yet? <Link to="/signup">Register here</Link>
+                </p>
               </div>
             </div>
           </div>

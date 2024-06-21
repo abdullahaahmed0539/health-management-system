@@ -2,8 +2,12 @@ import axios from 'axios';
 
 const apiBaseUrl = 'http://localhost:5001/api';
 
+const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+};
+
 export const fetchPatients = async () => {
-    return axios.get(`${apiBaseUrl}/patients`).then(res => res.data);
+    return axios.get(`${apiBaseUrl}/patients`, config).then(res => res.data);
 };
 
 export const fetchPatientById = async (id: number) => {
