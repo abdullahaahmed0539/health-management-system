@@ -5,7 +5,6 @@ import { fetchUsers } from "../services/UserService";
 
 interface Props {}
 
-
 const UserList = (props: Props) => {
   const [users, setUsers] = useState<RawProfileData[]>();
   const [loading, setLoading] = useState<boolean>(true);
@@ -15,10 +14,9 @@ const UserList = (props: Props) => {
     const getUserList = async () => {
       const result = await fetchUsers();
       setUsers(result);
-      console.log(users);
     };
     getUserList();
-    console.log(users);
+    // console.log(users);
   }, []);
 
   return (
@@ -32,18 +30,17 @@ const UserList = (props: Props) => {
             <th>Email</th>
             {/* Add other headers as needed */}
           </tr>
-          <tbody>
-            {users && users.map((user) => (
-              <tr key={user._id}>
+        </thead>
+        <tbody>
+          {users &&
+            users.map((user, index) => (
+              <tr key={index}>
                 <td>{user._id}</td>
-                <td>{user.role}</td>
-                <td>{user.firstName}</td>
+                <td>{user.firstName.concat(" ", user.lastName)}</td>
                 <td>{user.email}</td>
               </tr>
             ))}
-          </tbody> 
-         
-        </thead>
+        </tbody>
       </Table>
     </>
   );

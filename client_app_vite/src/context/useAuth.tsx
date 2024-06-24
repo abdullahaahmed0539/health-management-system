@@ -37,7 +37,6 @@ export const UserProvider = ({ children }: Props) => {
     if (user && token) {
       setUser(JSON.parse(user));
       setToken(token);
-      console.log(token);
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
     setIsReady(true);
@@ -53,7 +52,6 @@ export const UserProvider = ({ children }: Props) => {
     await registerApi(firstName, lastName, email, password, address)
       .then((res) => {
         if (res) {
-          console.log("test");
           localStorage.setItem("token", res?.data.token);
           const userObj = {
             firstName: res?.data.firstName,
@@ -66,9 +64,7 @@ export const UserProvider = ({ children }: Props) => {
           localStorage.setItem("user", JSON.stringify(userObj));
           setToken(res?.data.token!);
           setUser(userObj!);
-          console.log("test");
           toast.success("Registration successful");
-          console.log("test");
           navigate("/");
         }
       })
@@ -78,7 +74,6 @@ export const UserProvider = ({ children }: Props) => {
   const loginUser = async (email: string, password: string) => {
     await loginApi(email, password)
       .then((res) => {
-        console.log("test");
         if (res) {
           localStorage.setItem("token", res?.data.token);
           const userObj = {

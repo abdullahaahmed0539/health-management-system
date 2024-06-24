@@ -22,7 +22,7 @@ const SearchPage = (props: Props) => {
             </Form.Group>
           </Col>
         </Row>
-        <Row>
+        <Row className="mb-4">
           <UserList />
         </Row>
       </Form>
