@@ -36,6 +36,7 @@ class AuthController {
       if (!passwordVerified) return res.status(401).json({ error: { message: "Incorrect password." } });
       const token = jwt.sign(
         {
+          id: user._id,
           email: user.email,
           timeStamp: Date.now(),
           role: user.role,
@@ -44,11 +45,12 @@ class AuthController {
         { expiresIn: process.env.JWT_PVT_EXPIRY }
       );
       const responseObj = {
+        id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
         token,
-        role: user.role
+        role: user.role,
       };
       return res.status(200).json(responseObj);
     }
