@@ -4,6 +4,10 @@ import { logger } from "./error-logger";
 import mongoose from "mongoose";
 import User from "./lib/models/user";
 import { generate } from "password-hash";
+const fs = require("fs");
+
+var https = require("https");
+
 
 dotenv.config();
 
@@ -36,13 +40,26 @@ try {
 
 
   const http_port: number = process.env.HTTP_PORT as unknown as number || 5001;
+  const https_port: number =
+    (process.env.HTTPS_PORT as unknown as number) || 5000;
 
 
   app.listen(http_port, () => {
     // console.clear();
-    logger.info(`⚡️Server is running at http://localhost:${http_port}`);
+    logger.info(`⚡️HTTP Server is running at http://localhost:${http_port}`);
     logger.info("Connecting to database...");
     
+  });
+
+const options = {
+  key: fs.readFileSync("certificates/server.key"),
+  cert: fs.readFileSync("certificates/server.cert"),
+};
+
+// Creating https server by passing
+// options and app object
+  https.createServer(options, app).listen(https_port, () => {
+      logger.info(`⚡️HTTPS Server is running at http://localhost:${https_port}`);
   });
 } catch (error: any) {
   logger.error(`"${error.message}"`);
