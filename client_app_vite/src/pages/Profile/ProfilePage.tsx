@@ -1,39 +1,91 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import ProfileForm from "./ProfileForm";
-import { ProfileData, RawProfile, Tag } from "../../models/User";
-import { useLocalStorage } from "@uidotdev/usehooks";
+import { Container, Spinner, Alert } from "react-bootstrap";
+import { config } from "dotenv";
+import { getUserFromLocalStorage } from "../../utilities/LocalStorageUtils";
+import { Profile } from "../../models/User";
 
-
-interface Props {}
-
-const ProfilePage = (props: Props) => {
-  const [profile, setProfile] = useLocalStorage<RawProfile[]>("PROFILE", [])
-  const [tags, setTags] = useLocalStorage<Tag[]>("TAGS", [])
-  console.log(localStorage.key.toString())
+const ProfilePage: React.FC = () => {
+  const [user, setUser] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    localStorage.setItem(localStorage.key.toString(), JSON.stringify(profile)), [profile, setProfile]
-  })
+    const fetchUser = async () => {
+      try {
+        setLoading(true);
 
-  function addTag(tag: Tag){
-    setTags(prev => [...prev, tag])
+        // Fetch all users data (assuming it's an array)
+        const token = localStorage.getItem("token");
+        const config = {
+          headers: { Authorization: `Bearer ${token}` },
+        };
+        const response = await axios.get<Profile[]>(
+          "http://localhost:5001/api/v1/users",
+          config
+        );
+
+        // Get email from localStorage
+        const user = getUserFromLocalStorage();
+        const userEmail = user?.email;
+        console.log("userEmail", userEmail);
+        console.log("response.data", response.data);
+
+        // Find the user with the matching email
+        if (response.data) {
+          const foundUser = response.data.find((u) => u.email === userEmail);
+          if (foundUser) {
+            setUser(foundUser);
+            localStorage.setItem("_id", foundUser._id);
+            console.log("foundUser", foundUser._id);
+          } else {
+            setError("User not found");
+          }
+        }
+        setLoading(false);
+      } catch (error) {
+        setError("Failed to fetch users.");
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleUpdate = (updatedUser: Profile) => {
+    setUser(updatedUser);
+  };
+
+  if (loading) {
+    return (
+      <Container>
+        <Spinner animation="border" />
+      </Container>
+    );
   }
 
-  // const profileWithTags = useMemo(() => {
-  //   return profile.map(profile => {
-  //     return {
-  //       ...profile, tags: tags.filter(tag => profile.tagIds.includes(tag.id.toString()))
-  //     }
-  //   })
-  // }, [profile, tags])
+  if (error) {
+    return (
+      <Container>
+        <Alert variant="danger">{error}</Alert>
+      </Container>
+    );
+  }
 
-  return <div className="mx-4">
-    <ProfileForm onSubmit={function (data: ProfileData): void {
-      throw new Error("Function not implemented.");
-    } } onAddTag={function (tag: Tag): void {
-      throw new Error("Function not implemented.");
-    } } availableTags={[]} />
-  </div>;
+  if (!user) {
+    return (
+      <Container>
+        <Alert variant="warning">User not found</Alert>
+      </Container>
+    );
+  }
+
+  return (
+    <Container>
+      <ProfileForm user={user} onUpdate={handleUpdate}/>
+    </Container>
+  );
 };
 
 export default ProfilePage;

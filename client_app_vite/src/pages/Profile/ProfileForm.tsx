@@ -1,284 +1,254 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Button, Col, Form, Row, Stack } from "react-bootstrap";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { Link } from "react-router-dom";
-import CreateableReactSelect from "react-select/creatable";
-import { ProfileData, RawProfileData, Tag } from "../../models/User";
-import RoleDropdown, { Role } from "../../components/RoleDropdown";
-import { v4 as uuidV4 } from "uuid";
-import { Axios } from "axios";
+import React, { useState, ChangeEvent, useEffect } from "react";
+import { Button, Form, Col, Row, Container, Stack } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+import CreatableSelect from "react-select/creatable";
+import { MultiValue } from "react-select";
+import axios from "axios";
+import { Profile } from "../../models/User";
 
-type ProfileFormProps = {
-  onSubmit: (data: ProfileData) => void;
-  onAddTag: (tag: Tag) => void;
-  availableTags: Tag[];
-} & Partial<ProfileData>;
+interface ProfileFormProps {
+  user?: Profile;
+  onUpdate: (updatedUser: Profile) => void;
+}
 
-const ProfileForm = ({
-  onSubmit,
-  onAddTag,
-  availableTags,
-}: ProfileFormProps) => {
-  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [user, setUser] = useState<RawProfileData | null>(null);
+const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
+  const [profile, setProfile] = useState<Profile | undefined>(user);
+  const [isEditable, setIsEditable] = useState(false);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      const config = {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      };
-      console.log(localStorage.getItem("token"));
-      const response = await fetch(
-        "http://localhost:5001/api/v1/users",
-        config
-      );
-      const users = (await response.json()) as RawProfileData;
-      console.log(users);
-      setUser(users);
-    };
+    setProfile(user);
+  }, [user]);
 
-    fetchUsers();
-  }, []);
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+    index?: number
+  ) => {
+    const { name, value } = e.target;
+    setProfile((prevProfile) => {
+      if (!prevProfile) return prevProfile;
 
-  const roleRef = useRef<HTMLInputElement>(null);
-  const firstNameRef = useRef<HTMLInputElement>(null);
-  const lastNameRef = useRef<HTMLInputElement>(null);
-  const emailRef = useRef<HTMLInputElement>(null);
-  const addressRef = useRef<HTMLInputElement>(null);
-  const cityRef = useRef<HTMLInputElement>(null);
-  const countryRef = useRef<HTMLInputElement>(null);
-  const phoneNumberRef = useRef<HTMLInputElement>(null);
-  const designationsRef = useRef<HTMLInputElement>(null);
-  const dateOfBirthRef = useRef<HTMLInputElement>(null);
-  const genderMaleRef = useRef<HTMLInputElement>(null);
-  const genderFemaleRef = useRef<HTMLInputElement>(null);
+      if (name.startsWith("address") && index !== undefined) {
+        const updatedAddress = [...prevProfile.address];
+        updatedAddress[index] = value;
+        return { ...prevProfile, address: updatedAddress };
+      }
 
-  const handleSelectRole = (role: Role) => {
-    setSelectedRole(role);
-    console.log(`Selected role: ${role}`);
+      return { ...prevProfile, [name]: value };
+    });
   };
 
-  const handleDateChange = (date: Date | null) => {
-    setDateOfBirth(date);
-    if (dateOfBirthRef.current) {
-      dateOfBirthRef.current.value = date
-        ? date.toISOString().split("T")[0]
-        : "";
+  const handleDesignationChange = (
+    newValue: MultiValue<{ label: string; value: string }>
+  ) => {
+    const updatedDesignation = newValue.map((item) => item.value);
+    setProfile((prevProfile) => prevProfile ? { ...prevProfile, designation: updatedDesignation } : prevProfile);
+  };
+
+  const toggleEdit = () => setIsEditable(!isEditable);
+
+  const saveProfile = async () => {
+    if (!profile) return;
+
+    try {
+      const _id = localStorage.getItem("_id");
+      console.log("profile", profile);
+      const response = await axios.put(
+        `https://localhost:5001/users/${_id}`,
+        profile
+      );
+
+      setIsEditable(false);
+      onUpdate(response.data); // Update the parent component state with the updated user data
+    } catch (error) {
+      console.error("Failed to update profile", error);
     }
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    onSubmit({
-      role: roleRef.current!.value,
-      firstName: firstNameRef.current!.value,
-      lastName: lastNameRef.current!.value,
-      address: addressRef.current!.value,
-      city: cityRef.current!.value,
-      country: countryRef.current!.value,
-      dateOfBirth: dateOfBirthRef.current!.value,
-      gender: genderMaleRef.current!.checked
-        ? "Male"
-        : genderFemaleRef.current!.checked
-        ? "Female"
-        : "",
-      phoneNumber: phoneNumberRef.current!.value,
-      designations: [],
-      email: emailRef.current!.value,
-    });
-    console.log({
-      role: roleRef.current!.value,
-      firstName: firstNameRef.current!.value,
-      lastName: lastNameRef.current!.value,
-      address: addressRef.current!.value,
-      city: cityRef.current!.value,
-      country: countryRef.current!.value,
-      dateOfBirth: dateOfBirthRef.current!.value,
-      gender: genderMaleRef.current!.checked
-        ? "Male"
-        : genderFemaleRef.current!.checked
-        ? "Female"
-        : "",
-      phoneNumber: phoneNumberRef.current!.value,
-      designations: [],
-      email: emailRef.current!.value,
-    });
+  const cancelEdit = () => {
+    setProfile(user);
+    setIsEditable(false);
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <div className="row">
+    <Container>
+      <h2>My Profile</h2>
+      <Form>
         <Stack gap={2}>
-          <Row>
+          <Row className="mb-3">
             <Col>
-              <Form.Group className="mb-1" controlId="firstName">
+              <Form.Group controlId="formRole">
                 <Form.Label>Role</Form.Label>
-                <RoleDropdown onSelectRole={handleSelectRole} />
+                <Form.Control
+                  as="select"
+                  name="role"
+                  value={profile?.role}
+                  onChange={handleChange}
+                  disabled={!isEditable}
+                >
+                  <option value="Admin">Admin</option>
+                  <option value="Doctor">Doctor</option>
+                  <option value="Staff">Staff</option>
+                  <option value="Patient">Patient</option>
+                </Form.Control>
               </Form.Group>
             </Col>
             <Col>
-              <Form.Group className="mb-3" controlId="firstName">
+              <Form.Group controlId="formFirstName">
                 <Form.Label>First Name</Form.Label>
                 <Form.Control
-                  ref={firstNameRef}
-                  required
                   type="text"
-                  placeholder="Enter first name"
+                  name="firstName"
+                  value={profile?.firstName}
+                  onChange={handleChange}
+                  readOnly={!isEditable}
                 />
               </Form.Group>
             </Col>
             <Col>
-              <Form.Group className="mb-3" controlId="lastName">
+              <Form.Group controlId="formLastName">
                 <Form.Label>Last Name</Form.Label>
                 <Form.Control
-                  ref={lastNameRef}
-                  required
                   type="text"
-                  placeholder="Enter last name"
+                  name="lastName"
+                  value={profile?.lastName}
+                  onChange={handleChange}
+                  readOnly={!isEditable}
                 />
               </Form.Group>
             </Col>
           </Row>
-          <Form.Group className="mb-3" controlId="lastName">
+
+          <Form.Group className="mb-3" controlId="formEmail">
             <Form.Label>Email</Form.Label>
             <Form.Control
-              ref={emailRef}
-              required
-              type="text"
-              placeholder="Enter email"
+              type="email"
+              name="email"
+              value={profile?.email}
+              onChange={handleChange}
+              readOnly={!isEditable}
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="address">
-            <Form.Label>Address</Form.Label>
+
+          {(profile?.address ?? [""]).map((address, index) => (
+            <Form.Group
+              className="mb-3"
+              controlId={`formAddress${index}`}
+              key={index}
+            >
+              <Form.Label>Address {index + 1}</Form.Label>
+              <Form.Control
+                type="text"
+                name={`address${index}`}
+                value={address}
+                onChange={(e) => handleChange(e, index)}
+                readOnly={!isEditable}
+              />
+            </Form.Group>
+          ))}
+
+          <Form.Group className="mb-3" controlId="formCity">
+            <Form.Label>City</Form.Label>
             <Form.Control
-              ref={addressRef}
-              required
               type="text"
-              placeholder="Enter address"
+              name="city"
+              value={profile?.city}
+              onChange={handleChange}
+              readOnly={!isEditable}
             />
           </Form.Group>
-          <Row>
+
+          <Form.Group className="mb-3" controlId="formCountry">
+            <Form.Label>Country</Form.Label>
+            <Form.Control
+              type="text"
+              name="country"
+              value={profile?.country}
+              onChange={handleChange}
+              readOnly={!isEditable}
+            />
+          </Form.Group>
+
+          <Row className="mb-3">
             <Col>
-              <Form.Group className="mb-3" controlId="city">
-                <Form.Label>City</Form.Label>
-                <Form.Control
-                  ref={cityRef}
-                  required
-                  type="text"
-                  placeholder="Enter city"
-                />
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group className="mb-3" controlId="country">
-                <Form.Label>Country</Form.Label>
-                <Form.Control
-                  ref={countryRef}
-                  required
-                  type="text"
-                  placeholder="Enter country"
-                />
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <Form.Group className="mb-3" controlId="dateOfBirth">
+              <Form.Group controlId="formDateOfBirth">
                 <Form.Label>Date of Birth</Form.Label>
-                <div className="mw-100">
-                  <DatePicker
-                    selected={dateOfBirth}
-                    onChange={handleDateChange}
-                    dateFormat="yyyy-MM-dd"
-                    className="form-control"
-                    placeholderText="Select date of birth"
+                <Form.Control
+                  type="date"
+                  name="dateOfBirth"
+                  value={profile?.dateOfBirth}
+                  onChange={handleChange}
+                  readOnly={!isEditable}
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group controlId="formGender">
+                <Form.Label>Gender</Form.Label>
+                <div>
+                  <Form.Check
+                    inline
+                    type="radio"
+                    label="Male"
+                    name="gender"
+                    value="Male"
+                    checked={profile?.gender === "Male"}
+                    onChange={handleChange}
+                    disabled={!isEditable}
                   />
-                  <input
-                    ref={dateOfBirthRef}
-                    type="hidden"
-                    value={
-                      dateOfBirth ? dateOfBirth.toISOString().split("T")[0] : ""
-                    }
+                  <Form.Check
+                    inline
+                    type="radio"
+                    label="Female"
+                    name="gender"
+                    value="Female"
+                    checked={profile?.gender === "Female"}
+                    onChange={handleChange}
+                    disabled={!isEditable}
                   />
                 </div>
               </Form.Group>
             </Col>
-            <Col>
-              <Form.Label>Gender</Form.Label>
-              <div className="form-check">
-                <input
-                  ref={genderFemaleRef}
-                  className="form-check-input"
-                  type="radio"
-                  name="RadioGender"
-                  id="genderFemale"
-                />
-                <label className="form-check-label" htmlFor="genderFemale">
-                  Female
-                </label>
-              </div>
-              <div className="form-check">
-                <input
-                  ref={genderMaleRef}
-                  className="form-check-input"
-                  type="radio"
-                  name="RadioGender"
-                  id="genderMale"
-                />
-                <label className="form-check-label" htmlFor="genderMale">
-                  Male
-                </label>
-              </div>
-            </Col>
           </Row>
-          <Form.Group className="mb-3" controlId="phoneNumber">
-            <Form.Label>Phone number</Form.Label>
+
+          <Form.Group className="mb-3" controlId="formPhone">
+            <Form.Label>Phone</Form.Label>
             <Form.Control
-              ref={phoneNumberRef}
-              required
               type="text"
-              placeholder="Enter phone number"
+              name="phone"
+              value={profile?.phone}
+              onChange={handleChange}
+              readOnly={!isEditable}
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="designation">
+
+          <Form.Group className="mb-3" controlId="formDesignation">
             <Form.Label>Designations</Form.Label>
-            <CreateableReactSelect
-              // onCreateOption={(label) => {
-              //   const newTag = { id: uuidV4(), label };
-              //   onAddTag(newTag);
-              //   setSelectedTags((prev) => [...prev, newTag]);
-              // }}
-              value={selectedTags.map((tag) => {
-                return { label: tag.label, value: tag.id };
-              })}
-              onChange={(tags) => {
-                setSelectedTags(
-                  tags.map((tag) => {
-                    return { label: tag.label, id: tag.value };
-                  })
-                );
-              }}
+            <CreatableSelect
               isMulti
-              required
-              placeholder="Enter designations"
+              value={(profile?.designation ?? []).map((designation) => ({
+                label: designation,
+                value: designation,
+              }))}
+              onChange={handleDesignationChange}
+              isDisabled={!isEditable}
             />
           </Form.Group>
-          <Stack direction="horizontal" gap={2} className="justify-content-end">
-            <Button type="submit" variant="primary">
-              Save
-            </Button>
-            <Link to="..">
-              <Button type="button" variant="outline-secondary">
-                Cancel
-              </Button>
-            </Link>
-          </Stack>
         </Stack>
-      </div>
-    </Form>
+        <Stack direction="horizontal" gap={2} className="justify-content-end">
+          <Button
+            variant="primary"
+            onClick={isEditable ? saveProfile : toggleEdit}
+          >
+            {isEditable ? "Save" : "Change"}
+          </Button>
+          {isEditable && (
+            <Button variant="secondary" onClick={cancelEdit} className="ms-2">
+              Cancel
+            </Button>
+          )}
+        </Stack>
+      </Form>
+    </Container>
   );
 };
 

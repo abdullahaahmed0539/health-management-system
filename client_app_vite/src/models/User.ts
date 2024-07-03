@@ -17,46 +17,35 @@ export type UserProfile = {
   role: null;
 };
 
-export type Profile = {
-  id: string;
-} & ProfileData;
-
 export type RawProfile = {
-  id: string;
+  _id: string;
 } & RawProfileData
 
-export type RawProfileData = {
+export interface RawProfileData {
+  role: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  address: string[];
+  city: string;
+  country: string;
+  dateOfBirth: string;
+  gender: string;
+  phoneNumber: string;
+  designation: string[];
+}
+
+export interface Profile {
   _id: string;
   role: string;
   firstName: string;
   lastName: string;
   email: string;
-  address: string;
+  address: string[];
   city: string;
   country: string;
   dateOfBirth: string;
   gender: string;
-  phoneNumber: string;
-  tagIds: string[];
+  phone: string;
+  designation: string[];
 }
-
-export type ProfileData = {
-  role: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  address: string;
-  city: string;
-  country: string;
-  dateOfBirth: string;
-  gender: string;
-  phoneNumber: string;
-  designations: Tag[];
-};
-
-export type Tag = {
-  id: number;
-  label: string;
-};
-
-
