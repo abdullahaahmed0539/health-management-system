@@ -25,15 +25,6 @@ const HomePage = ({}: Props) => {
       {user?.role  === UserRole.Staff && <><p>Welcome, Staff!</p><PatientsList /></>}
       {user?.role  === UserRole.Guest && <p>Welcome, Guest!</p>}
       {user?.role  === UserRole.Basic && <p>Welcome, Basic!</p>}
-      <ul className="list-group">
-        <li className="list-group-item d-flex justify-content-between align-items-center">
-        Open Treatment 1
-        </li>
-        <li className="list-group-item">Open Treatment 2</li>
-        <li className="list-group-item">Open Treatment 3</li>
-        <li className="list-group-item">Open Treatment 4</li>
-        <li className="list-group-item">Open Treatment 5</li>
-      </ul>
     </div>
   );
 };
