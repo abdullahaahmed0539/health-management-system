@@ -5,6 +5,7 @@ import CreatableSelect from "react-select/creatable";
 import { MultiValue } from "react-select";
 import axios from "axios";
 import { Profile } from "../../models/User";
+import { UserRole } from "../../models/Roles";
 
 interface ProfileFormProps {
   user?: Profile;
@@ -69,6 +70,23 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
     setIsEditable(false);
   };
 
+  const canEditField = (field: string) => {
+    if (!profile) return false;
+    const role = profile.role as UserRole;
+
+    switch (role) {
+      case UserRole.Admin:
+        return true;
+      case UserRole.Doctor:
+      case UserRole.Staff:
+        return !["role", "firstName", "lastName", "email"].includes(field);
+      case UserRole.Guest:
+        return ["address", "city", "country", "dateOfBirth", "gender", "phone"].includes(field);
+      default:
+        return false;
+    }
+  };
+
   return (
     <Container>
       <h2>My Profile</h2>
@@ -83,7 +101,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
                   name="role"
                   value={profile?.role}
                   onChange={handleChange}
-                  disabled={!isEditable}
+                  disabled={!isEditable || !canEditField("role")}
                 >
                   <option value="Admin">Admin</option>
                   <option value="Doctor">Doctor</option>
@@ -100,7 +118,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
                   name="firstName"
                   value={profile?.firstName}
                   onChange={handleChange}
-                  readOnly={!isEditable}
+                  readOnly={!isEditable || !canEditField("firstName")}
                 />
               </Form.Group>
             </Col>
@@ -112,7 +130,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
                   name="lastName"
                   value={profile?.lastName}
                   onChange={handleChange}
-                  readOnly={!isEditable}
+                  readOnly={!isEditable || !canEditField("lastName")}
                 />
               </Form.Group>
             </Col>
@@ -125,7 +143,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
               name="email"
               value={profile?.email}
               onChange={handleChange}
-              readOnly={!isEditable}
+              readOnly={!isEditable || !canEditField("email")}
             />
           </Form.Group>
 
@@ -141,7 +159,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
                 name={`address${index}`}
                 value={address}
                 onChange={(e) => handleChange(e, index)}
-                readOnly={!isEditable}
+                readOnly={!isEditable || !canEditField("address")}
               />
             </Form.Group>
           ))}
@@ -153,7 +171,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
               name="city"
               value={profile?.city}
               onChange={handleChange}
-              readOnly={!isEditable}
+              readOnly={!isEditable || !canEditField("city")}
             />
           </Form.Group>
 
@@ -164,7 +182,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
               name="country"
               value={profile?.country}
               onChange={handleChange}
-              readOnly={!isEditable}
+              readOnly={!isEditable || !canEditField("country")}
             />
           </Form.Group>
 
@@ -177,7 +195,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
                   name="dateOfBirth"
                   value={profile?.dateOfBirth}
                   onChange={handleChange}
-                  readOnly={!isEditable}
+                  readOnly={!isEditable || !canEditField("dateOfBirth")}
                 />
               </Form.Group>
             </Col>
@@ -193,7 +211,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
                     value="Male"
                     checked={profile?.gender === "Male"}
                     onChange={handleChange}
-                    disabled={!isEditable}
+                    disabled={!isEditable || !canEditField("gender")}
                   />
                   <Form.Check
                     inline
@@ -203,7 +221,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
                     value="Female"
                     checked={profile?.gender === "Female"}
                     onChange={handleChange}
-                    disabled={!isEditable}
+                    disabled={!isEditable || !canEditField("gender")}
                   />
                 </div>
               </Form.Group>
@@ -217,7 +235,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
               name="phone"
               value={profile?.phone}
               onChange={handleChange}
-              readOnly={!isEditable}
+              readOnly={!isEditable || !canEditField("phone")}
             />
           </Form.Group>
 
@@ -230,7 +248,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
                 value: designation,
               }))}
               onChange={handleDesignationChange}
-              isDisabled={!isEditable}
+              isDisabled={!isEditable || !canEditField("designation")}
             />
           </Form.Group>
         </Stack>
