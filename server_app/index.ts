@@ -3,7 +3,8 @@ import { app } from "./app";
 import { logger } from "./error-logger";
 import mongoose from "mongoose";
 import User from "./lib/models/user";
-import { generate } from "password-hash";
+import { users, patients }  from "./data";
+import Patient from "./lib/models/patient";
 const fs = require("fs");
 
 var https = require("https");
@@ -18,17 +19,18 @@ try {
     .connect(connectionString)
     .then(async () => {
       logger.info("Database connection successful.");
-      const user = await User.findOne({ email: 'abdullah@gmail.com' });
-      if (!user) {
-        let newAdminUser = new User({
-          firstName: process.env.ADMIN_FIRST_NAME,
-          lastName: process.env.ADMIN_LAST_NAME,
-          email: process.env.ADMIN_EMAIL,
+      const user = await User.find();
+      if (user.length === 0) {
+        await User.bulkSave(users);
+        const newUsers = await User.find();
+        const newPatients = newUsers.filter(u => u.role === 'patient');
+        const newDoctor = (newUsers.filter((u) => u.role === "doctor"))[0];
+        patients.map((p, i) => {
+          p.userId = newPatients[i].id
+          p.treatmentHistory.map(t => t.doctorId = newDoctor.id)
         });
-        newAdminUser.hashedPassword = generate(process.env.ADMIN_PASSWORD as string);
-        newAdminUser.role = "sysAdmin";
-        await newAdminUser.save();
-        logger.info('Admin created.')
+        await Patient.bulkSave(patients);
+        logger.info('Data is seeded in the database')
       }
 
     })
