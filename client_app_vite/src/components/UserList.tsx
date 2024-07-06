@@ -19,7 +19,7 @@ const UserList: React.FC<UserListProps> = ({ users, currentUserRole, handleDelet
   };
 
   const handleViewProfile = (userId: string) => {
-    navigate(`/profile/${userId}`);
+    navigate(`/userprofile/${userId}`);
   };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {

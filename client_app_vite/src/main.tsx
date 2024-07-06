@@ -14,6 +14,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import EditTreatmentPage from "./pages/Treatment/EditTreatmentPage";
 import NewPatientPage from "./pages/Patient/NewPatientPage.tsx";
 import ViewPatientPage from "./pages/Patient/ViewPatientPage.tsx";
+import ViewProfilePage from "./pages/Profile/ViewProfilePage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "userprofile/:userId",
+        element: (
+          <ProtectedRoute>
+            <ViewProfilePage />
           </ProtectedRoute>
         ),
       },

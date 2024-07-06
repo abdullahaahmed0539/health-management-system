@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import ProfileForm from "./ProfileForm";
+import ProfileForm from "../../components/ProfileForm";
 import { Container, Spinner, Alert } from "react-bootstrap";
 import { config } from "dotenv";
 import { getUserFromLocalStorage } from "../../utilities/LocalStorageUtils";

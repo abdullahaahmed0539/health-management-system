@@ -35,19 +35,6 @@ const PatientList: React.FC = () => {
     fetchPatients();
   }, []);
 
-  const handleDelete = async (patientId: string) => {
-    try {
-      const token = localStorage.getItem("token");
-      const config = {
-        headers: { Authorization: `Bearer ${token}` },
-      };
-      await axios.delete(`http://localhost:5001/api/v1/patients/${patientId}`, config);
-      setPatients(patients.filter(patient => patient._id !== patientId));
-    } catch (error) {
-      setError("Failed to delete patient.");
-    }
-  };
-
   const handleViewProfile = (patientId: string) => {
     navigate(`/patient/${patientId}`);
   };
@@ -102,13 +89,6 @@ const PatientList: React.FC = () => {
               <td>{patient.firstName}</td>
               <td>{patient.lastName}</td>
               <td>
-              <Button
-                  variant="danger"
-                  className="me-2"
-                  onClick={() => handleDelete(patient._id)}
-                >
-                  Delete
-                </Button>
                 <Button
                   variant="info"
                   onClick={() => handleViewProfile(patient._id)}

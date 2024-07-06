@@ -19,7 +19,7 @@ const ViewPatientPage: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         };
         const response = await axios.get<Patient>(
-          `http://localhost:5001/api/v1/patients/${id}`,
+          `http://localhost:5001/api/v1/patients/${id}/treatments/`,
           config
         );
         setPatient(response.data);

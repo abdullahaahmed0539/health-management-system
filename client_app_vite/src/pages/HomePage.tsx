@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import PatientsList from "../components/PatientList";
 import { UserRole } from "../models/Roles";
-import { UserProfile } from "../models/User";
 import { getUserFromLocalStorage } from "../utilities/LocalStorageUtils";
+import MockupPage from "./Profile/MockupPage";
 
 type Props = {
 };
@@ -20,6 +20,7 @@ const HomePage = ({}: Props) => {
 
   return (
     <div className="mx-4">
+      <MockupPage />
       {user?.role === UserRole.Admin && <><p>Welcome, Admin!</p><PatientsList /></>}
       {user?.role  === UserRole.Doctor && <><p>Welcome, Doctor!</p><PatientsList /></>}
       {user?.role  === UserRole.Staff && <><p>Welcome, Staff!</p><PatientsList /></>}

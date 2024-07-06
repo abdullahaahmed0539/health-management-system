@@ -2,8 +2,8 @@ import React, { useState, ChangeEvent, useEffect } from "react";
 import { Button, Form, Col, Row, Container, Stack } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
-import { Profile } from "../../models/User";
-import { UserRole } from "../../models/Roles";
+import { Profile } from "../models/User";
+import { UserRole } from "../models/Roles";
 
 interface ProfileFormProps {
   user?: Profile;
@@ -50,15 +50,15 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
 
       // Transform changedFields object to JSON string
       const changedFieldsJson = JSON.stringify(changedFields);
-      console.log("changedFieldsJson", changedFieldsJson);
 
       const response = await axios.put(
         `http://localhost:5001/api/v1/users/${_id}`,
-        changedFieldsJson,
+        changedFields,
         config
       );
       setIsEditable(false);
       setOriginalProfile(profile);
+      console.log("Profile updated", response.data);
       onUpdate(response.data); // Update the parent component state with the updated user data
 
       // Clear changedFields object after successful update
@@ -102,12 +102,13 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
   const formatDate = (date: string | undefined) => {
     if (!date) return "";
     const d = new Date(date);
+    // Convert date to string format yyyy-mm-dd
     return d.toISOString().substring(0, 10);
   };
 
   return (
     <Container>
-      <h2>My Profile</h2>
+      <h2>Profile</h2>
       <Form>
         <Stack gap={2}>
           <Row className="mb-3">
@@ -244,7 +245,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
             <Form.Label>Phone</Form.Label>
             <Form.Control
               type="text"
-              name="phoneNumbers"
+              name="phone"
               value={profile?.phone}
               onChange={handleChange}
               readOnly={!isEditable || !canEditField("phone")}
