@@ -75,7 +75,6 @@ class PatientController implements Controller {
         if (user && !patient) {
           const newPatient = new Patient();
           newPatient.userId = user._id as unknown as string;
-          console.log(newPatient)
           await newPatient.save();
           user.hashedPassword = null;
           if (user.role === 'basic') user.role = "patient";
@@ -116,65 +115,67 @@ class PatientController implements Controller {
   async update(req: Request, res: Response): Promise<Response> {
     try {
       
-      // const userId = req.params.userId;
-      // const { firstName, lastName, address, dateOfBirth, phoneNumber, designation, userRole, city, country, gender } = req.body;
-      // const token = req.headers.authorization!.split(" ")[1];
-      // const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
-      // const role = (<any>verifiedUser).role;
+      const userId = req.params.patientId;
+      const { firstName, lastName, address, dateOfBirth, phoneNumber, designation, userRole, city, country, gender } = req.body;
+      const token = req.headers.authorization!.split(" ")[1];
+      const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
+      const role = (<any>verifiedUser).role;
 
-      // if (role === "sysAdmin") {
-      //   const userToBeUpdated = await User.findById(userId).select("-hashedPassword");
-      //   if (userToBeUpdated) {
-      //     userToBeUpdated.firstName = firstName ? firstName : userToBeUpdated.firstName;
-      //     userToBeUpdated.lastName = lastName ? lastName : userToBeUpdated.lastName;
-      //     if (address) userToBeUpdated.addresses.push(address);
-      //     userToBeUpdated.dateOfBirth = dateOfBirth ? dateOfBirth : userToBeUpdated.dateOfBirth;
-      //     if (phoneNumber) userToBeUpdated.phoneNumbers.push(phoneNumber);
-      //     userToBeUpdated.designation = designation ? designation : userToBeUpdated.designation;
-      //     userToBeUpdated.role = userRole ? userRole : userToBeUpdated.role;
-      //     userToBeUpdated.city = city ? city : userToBeUpdated.city;
-      //     userToBeUpdated.country = country ? country : userToBeUpdated.country;
-      //     userToBeUpdated.gender = gender ? gender : userToBeUpdated.gender;
+      if (role === "sysAdmin") {
+        
+        const userToBeUpdated = await User.findById(userId).select("-hashedPassword");
+        if (userToBeUpdated) {
+          userToBeUpdated.firstName = firstName ? firstName : userToBeUpdated.firstName;
+          userToBeUpdated.lastName = lastName ? lastName : userToBeUpdated.lastName;
+          if (address) userToBeUpdated.addresses.push(address);
+          userToBeUpdated.dateOfBirth = dateOfBirth ? dateOfBirth : userToBeUpdated.dateOfBirth;
+          if (phoneNumber) userToBeUpdated.phoneNumbers.push(phoneNumber);
+          userToBeUpdated.designation = designation ? designation : userToBeUpdated.designation;
+          userToBeUpdated.role = userRole ? userRole : userToBeUpdated.role;
+          userToBeUpdated.city = city ? city : userToBeUpdated.city;
+          userToBeUpdated.country = country ? country : userToBeUpdated.country;
+          userToBeUpdated.gender = gender ? gender : userToBeUpdated.gender;
 
-      //     await userToBeUpdated.save();
-      //     return res.status(201).json({
-      //       user: userToBeUpdated,
-      //     });
-      //   }
-      //   return res.status(404).json({
-      //     error: { message: `No user with userId ${userId} found.` },
-      //   });
-      // }
+          await userToBeUpdated.save();
+          return res.status(201).json({
+            user: userToBeUpdated,
+          });
+        }
+       
+        return res.status(404).json({
+          error: { message: `No user with userId ${userId} found.` },
+        });
+      }
+        
+      const patientToUpdate = await Patient.findOne({ userId });
+      if (!patientToUpdate) {
+        return res.status(404).json({ error: { message: `No patient with userId ${userId} found.` } });
+      }
+      
+      const patientUser = await User.findById(patientToUpdate.userId);
+      if (!patientUser) {
+        return res.status(404).json({ error: { message: `No user with userId ${userId} found.` } });
+      }
 
-      // const patientToUpdate = await Patient.findOne({ userId });
-      // if (!patientToUpdate) {
-      //   return res.status(404).json({ error: { message: `No patient with userId ${userId} found.` } });
-      // }
+      if (patientUser.email === (<any>verifiedUser).email) {
+        patientUser.firstName = firstName ? firstName : patientUser.firstName;
+        patientUser.lastName = lastName ? lastName : patientUser.lastName;
+        if (address) patientUser.addresses.push(address);
+        patientUser.dateOfBirth = dateOfBirth ? dateOfBirth : patientUser.dateOfBirth;
+        if (phoneNumber) patientUser.phoneNumbers.push(phoneNumber);
+        patientUser.designation = designation ? designation : patientUser.designation;
+        patientUser.role = userRole ? userRole : patientUser.role;
+        patientUser.city = city ? city : patientUser.city;
+        patientUser.country = country ? country : patientUser.country;
+        patientUser.gender = gender ? gender : patientUser.gender;
 
-      // const patientUser = await User.findById(patientToUpdate.userId);
-      // if (!patientUser) {
-      //   return res.status(404).json({ error: { message: `No user with userId ${userId} found.` } });
-      // }
+        await patientUser.save();
+        return res.status(201).json({
+          user: patientUser,
+        });
+      }
 
-      // if (patientUser.email === (<any>verifiedUser).email) {
-      //   patientUser.firstName = firstName ? firstName : patientUser.firstName;
-      //   patientUser.lastName = lastName ? lastName : patientUser.lastName;
-      //   if (address) patientUser.addresses.push(address);
-      //   patientUser.dateOfBirth = dateOfBirth ? dateOfBirth : patientUser.dateOfBirth;
-      //   if (phoneNumber) patientUser.phoneNumbers.push(phoneNumber);
-      //   patientUser.designation = designation ? designation : patientUser.designation;
-      //   patientUser.role = userRole ? userRole : patientUser.role;
-      //   patientUser.city = city ? city : patientUser.city;
-      //   patientUser.country = country ? country : patientUser.country;
-      //   patientUser.gender = gender ? gender : patientUser.gender;
-
-      //   await patientUser.save();
-      //   return res.status(201).json({
-      //     user: patientUser,
-      //   });
-      // }
-
-      // return res.status(401).json({ error: { message: "Unauthorized Access." } });
+      return res.status(401).json({ error: { message: "Unauthorized Access." } });
       return res.status(200)
     
     } catch (err: any) {
@@ -187,7 +188,7 @@ class PatientController implements Controller {
   async delete(req: Request, res: Response): Promise<Response> {
     try {
       const userId = req.params.patientId;
-      console.log(userId)
+    
       const token = req.headers.authorization!.split(" ")[1];
       const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
       const role = (<any>verifiedUser).role;
