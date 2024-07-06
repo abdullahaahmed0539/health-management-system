@@ -41,11 +41,11 @@ export interface Profile {
   firstName: string;
   lastName: string;
   email: string;
-  address: string[];
+  addresses: string;
   city: string;
   country: string;
   dateOfBirth: string;
   gender: string;
   phone: string;
-  designation: string[];
+  designation: string;
 }

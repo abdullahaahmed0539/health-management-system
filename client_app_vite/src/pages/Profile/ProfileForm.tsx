@@ -1,8 +1,6 @@
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { Button, Form, Col, Row, Container, Stack } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import CreatableSelect from "react-select/creatable";
-import { MultiValue } from "react-select";
 import axios from "axios";
 import { Profile } from "../../models/User";
 import { UserRole } from "../../models/Roles";
@@ -14,35 +12,28 @@ interface ProfileFormProps {
 
 const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
   const [profile, setProfile] = useState<Profile | undefined>(user);
+  const [originalProfile, setOriginalProfile] = useState<Profile | undefined>(user);
   const [isEditable, setIsEditable] = useState(false);
+  const [changedFields, setChangedFields] = useState<{ [key: string]: any }>({});
 
   useEffect(() => {
     setProfile(user);
+    setOriginalProfile(user);
   }, [user]);
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-    index?: number
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setProfile((prevProfile) => {
-      if (!prevProfile) return prevProfile;
+    setProfile((prevProfile) =>
+      prevProfile ? { ...prevProfile, [name]: value } : prevProfile
+    );
 
-      if (name.startsWith("address") && index !== undefined) {
-        const updatedAddress = [...prevProfile.address];
-        updatedAddress[index] = value;
-        return { ...prevProfile, address: updatedAddress };
-      }
-
-      return { ...prevProfile, [name]: value };
-    });
-  };
-
-  const handleDesignationChange = (
-    newValue: MultiValue<{ label: string; value: string }>
-  ) => {
-    const updatedDesignation = newValue.map((item) => item.value);
-    setProfile((prevProfile) => prevProfile ? { ...prevProfile, designation: updatedDesignation } : prevProfile);
+    // Store changed fields in the object
+    setChangedFields((prevFields) => ({
+      ...prevFields,
+      [name]: value,
+    }));
   };
 
   const toggleEdit = () => setIsEditable(!isEditable);
@@ -51,23 +42,36 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
     if (!profile) return;
 
     try {
+      const token = localStorage.getItem("token");
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
       const _id = localStorage.getItem("_id");
-      console.log("profile", profile);
-      const response = await axios.put(
-        `https://localhost:5001/users/${_id}`,
-        profile
-      );
 
+      // Transform changedFields object to JSON string
+      const changedFieldsJson = JSON.stringify(changedFields);
+      console.log("changedFieldsJson", changedFieldsJson);
+
+      const response = await axios.put(
+        `http://localhost:5001/api/v1/users/${_id}`,
+        changedFieldsJson,
+        config
+      );
       setIsEditable(false);
+      setOriginalProfile(profile);
       onUpdate(response.data); // Update the parent component state with the updated user data
+
+      // Clear changedFields object after successful update
+      setChangedFields({});
     } catch (error) {
       console.error("Failed to update profile", error);
     }
   };
 
   const cancelEdit = () => {
-    setProfile(user);
+    setProfile(originalProfile);
     setIsEditable(false);
+    setChangedFields({});
   };
 
   const canEditField = (field: string) => {
@@ -81,10 +85,24 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
       case UserRole.Staff:
         return !["role", "firstName", "lastName", "email"].includes(field);
       case UserRole.Guest:
-        return ["address", "city", "country", "dateOfBirth", "gender", "phone"].includes(field);
+        return [
+          "addresses",
+          "city",
+          "country",
+          "dateOfBirth",
+          "gender",
+          "phone",
+          "designation" // Allow editing designation field for Guest role
+        ].includes(field);
       default:
         return false;
     }
+  };
+
+  const formatDate = (date: string | undefined) => {
+    if (!date) return "";
+    const d = new Date(date);
+    return d.toISOString().substring(0, 10);
   };
 
   return (
@@ -147,22 +165,16 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
             />
           </Form.Group>
 
-          {(profile?.address ?? [""]).map((address, index) => (
-            <Form.Group
-              className="mb-3"
-              controlId={`formAddress${index}`}
-              key={index}
-            >
-              <Form.Label>Address {index + 1}</Form.Label>
-              <Form.Control
-                type="text"
-                name={`address${index}`}
-                value={address}
-                onChange={(e) => handleChange(e, index)}
-                readOnly={!isEditable || !canEditField("address")}
-              />
-            </Form.Group>
-          ))}
+          <Form.Group className="mb-3" controlId="formAddress">
+            <Form.Label>Address</Form.Label>
+            <Form.Control
+              type="text"
+              name="addresses"
+              value={profile?.addresses}
+              onChange={handleChange}
+              readOnly={!isEditable || !canEditField("addresses")}
+            />
+          </Form.Group>
 
           <Form.Group className="mb-3" controlId="formCity">
             <Form.Label>City</Form.Label>
@@ -193,7 +205,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
                 <Form.Control
                   type="date"
                   name="dateOfBirth"
-                  value={profile?.dateOfBirth}
+                  value={formatDate(profile?.dateOfBirth)}
                   onChange={handleChange}
                   readOnly={!isEditable || !canEditField("dateOfBirth")}
                 />
@@ -232,7 +244,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
             <Form.Label>Phone</Form.Label>
             <Form.Control
               type="text"
-              name="phone"
+              name="phoneNumbers"
               value={profile?.phone}
               onChange={handleChange}
               readOnly={!isEditable || !canEditField("phone")}
@@ -240,15 +252,13 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ user, onUpdate }) => {
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="formDesignation">
-            <Form.Label>Designations</Form.Label>
-            <CreatableSelect
-              isMulti
-              value={(profile?.designation ?? []).map((designation) => ({
-                label: designation,
-                value: designation,
-              }))}
-              onChange={handleDesignationChange}
-              isDisabled={!isEditable || !canEditField("designation")}
+            <Form.Label>Designation</Form.Label>
+            <Form.Control
+              type="text"
+              name="designation"
+              value={profile?.designation}
+              onChange={handleChange}
+              readOnly={!isEditable || !canEditField("designation")}
             />
           </Form.Group>
         </Stack>
