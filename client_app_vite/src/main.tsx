@@ -13,6 +13,7 @@ import NewTreatmentPage from "./pages/Treatment/NewTreatmentPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import EditTreatmentPage from "./pages/Treatment/EditTreatmentPage";
 import NewPatientPage from "./pages/Patient/NewPatientPage.tsx";
+import ViewPatientPage from "./pages/Patient/ViewPatientPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -64,7 +65,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "patients/new",
+        path: "patient/new",
         element: (
           <ProtectedRoute>
             <NewPatientPage />
@@ -72,15 +73,15 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "patients/:id",
+        path: "patient/:id",
         element: (
           <ProtectedRoute>
-            <h1>Show</h1>
+            <ViewPatientPage />
           </ProtectedRoute>
         ),
       },
       {
-        path: "patients/:id/edit",
+        path: "patient/:id/edit",
         element: (
           <ProtectedRoute>
             <EditTreatmentPage />

@@ -1,59 +1,127 @@
-import React, { useEffect, useState } from 'react';
-import { fetchPatients, deletePatient } from '../services/PatientService';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Table, Button, Container, Form, Spinner, Alert } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Patient } from "../models/Patient";
+import { getUserFromLocalStorage } from "../utilities/LocalStorageUtils";
 
-interface Patient {
-    id: number;
-    name: string;
-    age: number;
-    condition: string;
-}
+const PatientList: React.FC = () => {
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
-function PatientsList() {
-    const [patients, setPatients] = useState<Patient[]>([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        fetchPatients().then((data) => setPatients(data));
-    }, []);
-
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value);
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const config = {
+          headers: { Authorization: `Bearer ${token}` },
+        };
+        const response = await axios.get<Patient[]>(
+          "http://localhost:5001/api/v1/patients",
+          config
+        );
+        setPatients(response.data);
+        console.log(response.data);
+        setLoading(false);
+      } catch (error) {
+        setError("Failed to fetch patients.");
+        setLoading(false);
+      }
     };
 
-    const handleDelete = async (id: number) => {
-        await deletePatient(id);
-        setPatients(patients.filter(patient => patient.id !== id));
-    };
+    fetchPatients();
+  }, []);
 
-    const filteredPatients = patients.filter(patient =>
-        patient.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  const handleDelete = async (patientId: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      await axios.delete(`http://localhost:5001/api/v1/patients/${patientId}`, config);
+      setPatients(patients.filter(patient => patient._id !== patientId));
+    } catch (error) {
+      setError("Failed to delete patient.");
+    }
+  };
 
+  const handleViewProfile = (patientId: string) => {
+    navigate(`/patient/${patientId}`);
+  };
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredPatients = patients.filter(patient =>
+    patient.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) {
     return (
-        <div>
-            <h1>Dashboard Patients</h1>
-            <Link to="/patients/new">Add New Patient</Link>
-            <div>
-                <input
-                    type="text"
-                    placeholder="Search patients..."
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                />
-            </div>
-            <ul>
-                {filteredPatients.map(patient => (
-                    <li key={patient.id}>
-                        {patient.name} - <Link to={`/patients/${patient.id}`}>View Details</Link>
-                        <button onClick={() => navigate(`/patients/edit/${patient.id}`)}>Edit</button>
-                        <button onClick={() => handleDelete(patient.id)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
-        </div>
+      <Container>
+        <Spinner animation="border" />
+      </Container>
     );
-}
+  }
 
-export default PatientsList;
+  if (error) {
+    return (
+      <Container>
+        <Alert variant="danger">{error}</Alert>
+      </Container>
+    );
+  }
+
+  return (
+    <Container>
+      <h2>Patient List</h2>
+      <Form.Group controlId="searchBar">
+        <Form.Control
+          type="text"
+          placeholder="Search by last name"
+          value={searchTerm}
+          onChange={handleSearch}
+          className="mb-3"
+        />
+      </Form.Group>
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredPatients.map((patient) => (
+            <tr key={patient._id}>
+              <td>{patient.firstName}</td>
+              <td>{patient.lastName}</td>
+              <td>
+              <Button
+                  variant="danger"
+                  className="me-2"
+                  onClick={() => handleDelete(patient._id)}
+                >
+                  Delete
+                </Button>
+                <Button
+                  variant="info"
+                  onClick={() => handleViewProfile(patient._id)}
+                >
+                  View
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </Container>
+  );
+};
+
+export default PatientList;
