@@ -1,0 +1,44 @@
+
+
+# Use an official Node runtime as a parent image
+FROM node:latest
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the package.json and package-lock.json to install dependencies
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy ganache_contracts directory
+# COPY ganache_contracts ../ganache_contracts
+
+# Copy all files into the container
+COPY . .
+
+
+# Set environment variables
+ENV HTTPS_PORT=5000
+ENV HTTP_PORT=5001
+ENV BASE_URL='/api/v1'
+ENV MONGODB_CONNECTION_STRING='mongodb+srv://server_app:password123123@cluster0.0cbcl0i.mongodb.net/project_w2?retryWrites=true&w=majority&appName=Cluster0'
+ENV JWT_PVT_KEY='12345678!@%'
+ENV JWT_PVT_EXPIRY='15m'
+ENV ADMIN_FIRST_NAME='abdullah'
+ENV ADMIN_LAST_NAME='khan'
+ENV ADMIN_EMAIL='abdullah@gmail.com'
+ENV ADMIN_PASSWORD='12345678'
+ENV GANACHE_PRIVATE_KEY='0xae36ed718897a1ae531fea34355245bfef2e833089f02a05715366e77a0dee8b'
+ENV CONTRACT_ADDRESS='0x0Ff53e41aBD9aC02113Bf4a8aced7964772Ab4c5'
+ENV GANACHE_IP='http://127.0.0.1:7545'
+
+
+
+# Expose ports
+EXPOSE $HTTPS_PORT
+EXPOSE $HTTP_PORT
+
+# Command to run your server app
+CMD ["npm", "run", "dev"]

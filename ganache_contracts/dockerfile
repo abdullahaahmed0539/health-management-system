@@ -1,0 +1,43 @@
+# # Dockerfile for Ganache with deployed smart contracts
+
+# # Use an official Node.js runtime as a parent image
+# FROM node:latest
+
+# # Set the working directory in the container
+# WORKDIR /app
+
+# # Install Ganache globally
+# RUN npm install -g ganache-cli
+
+# # Copy compiled contracts from Truffle project
+# COPY ./client/src/contracts /app/contracts
+
+# # Expose the port Ganache runs on (default 7545)
+# EXPOSE 7545
+
+# # Command to run Ganache with pre-deployed contracts
+# CMD ["ganache-cli", "-p", "7545", "--networkId", "5777", "--deterministic", "--db", "/app/ganache", "--mnemonic", "your own mnemonic phrase here", "--gasLimit", "0xfffffffffff"]
+
+
+# Dockerfile for Ganache with deployed smart contracts
+
+# Use an official Node.js runtime as a parent image
+FROM node:latest
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Install Ganache globally
+RUN npm install -g ganache-cli
+
+# Install Truffle globally
+RUN npm install -g truffle
+
+# Copy Truffle project into the container
+COPY ./client /app/client
+
+# Expose the port Ganache runs on (default 7545)
+EXPOSE 7545
+
+# Command to run Ganache with pre-deployed contracts
+CMD ["ganache-cli", "-p", "7545", "--networkId", "5777", "--deterministic", "--db", "/app/ganache", "--mnemonic", "your own mnemonic phrase here", "--gasLimit", "0xfffffffffff"]

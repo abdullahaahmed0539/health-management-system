@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  ganache:
+    build: ./ganache_contracts
+    ports:
+      - "7545:7545"  # Map container port 8545 to host port 8545
+    networks:
+      - blockchain_network
+
+  server_app:
+    build: ./server_app
+    ports:
+      - "5000:5000"  # Map container port 3000 to host port 3000
+      - "5001:5001"
+    depends_on:
+      - ganache
+    networks:
+      - blockchain_network
+
+networks:
+  blockchain_network:
+    driver: bridge

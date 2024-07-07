@@ -14,8 +14,9 @@ const web3 = new Web3(process.env.GANACHE_IP as string);
 // Read the ABI from the compiled contract JSON file
 const contractPath = path.resolve(
   __dirname,
-  "../../../ganache_contracts/client/src/contracts/MedicalRecords.json"
+  "./MedicalRecords.json"
 );
+
 const contractABI = JSON.parse(fs.readFileSync(contractPath, "utf8")).abi;
 const privateKey = process.env.GANACHE_PRIVATE_KEY as string;
 const contractAddress = process.env.CONTRACT_ADDRESS as string;
