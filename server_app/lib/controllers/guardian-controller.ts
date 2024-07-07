@@ -5,6 +5,7 @@ import { Controller } from "./interfaces/controller";
 import Patient from "../models/patient";
 import User from "../models/user";
 import Guardian from "../models/guardian-contact";
+import { addGuardianToPatient } from "../blockchain/transactionFunctions";
 
 class GuardianController implements Controller {
   async getAll(req: Request, res: Response): Promise<Response> {
@@ -115,6 +116,13 @@ class GuardianController implements Controller {
 
         patient.guardianInfo.push(newGuardian);
         await patient.updateOne(patient);
+            await addGuardianToPatient(
+              userId,
+              newGuardian.name as string,
+              newGuardian.email as string,
+              newGuardian.phone as string,
+              newGuardian.relation as string
+            );
         return res.status(201).json({
           guardian: newGuardian,
         });
@@ -157,6 +165,13 @@ class GuardianController implements Controller {
        
 
         await patient.updateOne(patient);
+        await addGuardianToPatient(
+          userId,
+          toBeUpdatedGuardian.name as string,
+          toBeUpdatedGuardian.email as string,
+          toBeUpdatedGuardian.phone as string,
+          toBeUpdatedGuardian.relation as string
+        );
         return res.status(201).json({
           guardian: toBeUpdatedGuardian,
         });

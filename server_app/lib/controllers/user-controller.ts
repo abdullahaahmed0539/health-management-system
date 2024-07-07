@@ -5,6 +5,7 @@ import Patient from "../models/patient";
 import { Controller } from "./interfaces/controller";
 import User from "../models/user";
 import { generate } from "password-hash";
+import { addUser, getAllUsers, getUser } from "../blockchain/transactionFunctions";
 
 class UserController implements Controller {
   async getAll(req: Request, res: Response): Promise<Response> {
@@ -13,7 +14,8 @@ class UserController implements Controller {
       const verifiedUser = jwt.verify(token, process.env.JWT_PVT_KEY as string);
       const role = (<any>verifiedUser).role;
       if (role === "sysAdmin") {
-        const users = await User.find().select("-hashedPassword");;
+        const users = await User.find().select("-hashedPassword");
+        await getAllUsers();
         return res.status(200).json(users);
       }
       return res
@@ -39,6 +41,7 @@ class UserController implements Controller {
                   .status(404)
                     .json({ error: { message: `No user with userId ${userId} found.` } });
                 
+                await getUser(userId);
                 return res
                   .status(200)
                   .json({
@@ -100,7 +103,20 @@ class UserController implements Controller {
                 ? gender
                 : userToBeUpdated.gender;
 
-                await userToBeUpdated.updateOne(userToBeUpdated);
+              await userToBeUpdated.updateOne(userToBeUpdated);
+              await addUser(
+                userId,
+                userToBeUpdated.firstName as string,
+                userToBeUpdated.lastName as string,
+                userToBeUpdated.email as string,
+                userToBeUpdated.dateOfBirth as unknown as string,
+                userToBeUpdated.city as string,
+                address as string,
+                userToBeUpdated.role as string,
+                userToBeUpdated.country as string,
+                userToBeUpdated.gender as string,
+                phoneNumber as string
+              );
                 return res.status(201).json({
                 user: userToBeUpdated,
                 });
@@ -125,7 +141,20 @@ class UserController implements Controller {
            user.city = city ? city : user.city;
            user.country = country ? country : user.country;
            user.gender = gender ? gender : user.gender;
-           await user.updateOne(user);
+         await user.updateOne(user);
+          await addUser(
+            userId,
+            user.firstName as string,
+            user.lastName as string,
+            user.email as string,
+            user.dateOfBirth as unknown as string,
+            user.city as string,
+            address as string,
+            user.role as string,
+            user.country as string,
+            user.gender as string,
+            phoneNumber as string
+          );
            return res.status(201).json({
              user,
            });

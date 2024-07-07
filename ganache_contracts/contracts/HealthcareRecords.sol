@@ -113,7 +113,7 @@ contract MedicalRecords {
         string memory diseaseName,
         string memory doctorName,
         string memory treatmentDate
-    ) private {
+    ) public {
         
 
         Treatment memory treatment = Treatment({
@@ -133,7 +133,7 @@ contract MedicalRecords {
         string memory guardianEmail,
         string memory guardianPhone,
         string memory guardianRelation
-    ) private {
+    ) public {
  
 
         Guardian memory guardian = Guardian({

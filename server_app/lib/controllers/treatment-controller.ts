@@ -5,6 +5,7 @@ import { Controller } from "./interfaces/controller";
 import Patient from "../models/patient";
 import User from "../models/user";
 import Treatment from "../models/treatment";
+import { addTreatmentToPatient } from "../blockchain/transactionFunctions";
 
 
 class TreatmentController implements Controller {
@@ -120,6 +121,13 @@ class TreatmentController implements Controller {
 
         patient.treatmentHistory.push(newTreatment);
         await patient.updateOne(patient);
+        await addTreatmentToPatient(
+          userId,
+          newTreatment.name as string,
+          newTreatment.diseaseName as string,
+          newTreatment.doctorName as string,
+          newTreatment.treatmentDate!.toString()
+        );
         return res.status(201).json({
           treatment: newTreatment
         });
@@ -161,6 +169,13 @@ class TreatmentController implements Controller {
               toBeUpdatedTreatment.treatmentDate =
                   treatmentDate ?? toBeUpdatedTreatment.treatmentDate;
               
+            await addTreatmentToPatient(
+              userId,
+              toBeUpdatedTreatment.name as string,
+              toBeUpdatedTreatment.diseaseName as string,
+              toBeUpdatedTreatment.doctorName as string,
+              toBeUpdatedTreatment.treatmentDate!.toString()
+            );
               await patient.updateOne(patient);
               return res.status(201).json({
                 treatment: toBeUpdatedTreatment,

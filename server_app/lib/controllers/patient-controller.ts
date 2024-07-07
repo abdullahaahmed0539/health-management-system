@@ -5,6 +5,7 @@ import User from "../models/user";
 import Patient from "../models/patient";
 import { Controller } from "./interfaces/controller";
 import { generate } from "password-hash";
+import { addPatient, addUser, getAllPatients, getPatient } from "../blockchain/transactionFunctions";
 
 class PatientController implements Controller {
   async getAll(req: Request, res: Response): Promise<Response> {
@@ -14,6 +15,7 @@ class PatientController implements Controller {
       const role = (<any>verifiedUser).role;
       if (role === "doctor" || role === "staff" || role === "sysAdmin") {
         const patients = await User.find({ role: 'patient' }).select("-hashedPassword");
+        await getAllPatients();
         return res.status(200).json(patients);
       }
       return res.status(401).json({ error: { message: "Unauthorized Access." } });
@@ -44,6 +46,7 @@ class PatientController implements Controller {
         }
         const responseObj = { 'patient' : {...user,'treatmentHistory' : patient.treatmentHistory, 'guardianInfo' : patient.guardianInfo}
         }
+        await getPatient(userId);
         return res.status(200).json({ user, patient });
       }
       return res.status(401).json({ error: { message: "Unauthorized Access." } });
@@ -75,7 +78,19 @@ class PatientController implements Controller {
         if (user && !patient) {
           const newPatient = new Patient();
           newPatient.userId = user._id as unknown as string;
-          await newPatient.save();
+          const newPatientId = (await newPatient.save()).id;
+          await addPatient(
+            user.id,
+            newPatientId,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          );
           user.hashedPassword = null;
           if (user.role === 'basic') user.role = "patient";
           const responseObj = { "patient": user };
@@ -98,7 +113,19 @@ class PatientController implements Controller {
           await newUser.save();
           const newPatient = new Patient();
           newPatient.userId = newUser._id as unknown as string;
-          await newPatient.save();
+          const newPatientId = (await newPatient.save()).id;
+          await addPatient(
+            newUser.id,
+            newPatientId,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          );
           newUser.hashedPassword = null;
           const responseObj = { "patient": newUser };
           return res.status(201).json(responseObj);
@@ -137,6 +164,19 @@ class PatientController implements Controller {
           userToBeUpdated.gender = gender ? gender : userToBeUpdated.gender;
 
           await userToBeUpdated.save();
+          await addUser(
+            userId,
+            userToBeUpdated.firstName as string,
+            userToBeUpdated.lastName as string,
+            userToBeUpdated.email as string,
+            userToBeUpdated.dateOfBirth as unknown as string,
+            userToBeUpdated.city as string,
+            address as string,
+            userToBeUpdated.role as string,
+            userToBeUpdated.country as string,
+            userToBeUpdated.gender as string,
+            phoneNumber as string
+          );
           return res.status(201).json({
             user: userToBeUpdated,
           });
@@ -170,6 +210,19 @@ class PatientController implements Controller {
         patientUser.gender = gender ? gender : patientUser.gender;
 
         await patientUser.save();
+        await addUser(
+          userId,
+          patientUser.firstName as string,
+          patientUser.lastName as string,
+          patientUser.email as string,
+          patientUser.dateOfBirth as unknown as string,
+          patientUser.city as string,
+          address as string,
+          patientUser.role as string,
+          patientUser.country as string,
+          patientUser.gender as string,
+          phoneNumber as string
+        );
         return res.status(201).json({
           user: patientUser,
         });
